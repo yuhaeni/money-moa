@@ -22,11 +22,11 @@ class AccountLog(
         var detail: String,
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "member_id")
+        @JoinColumn(name = "memberId")
         var member: Member,
 
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "category_id")
+        @JoinColumn(name = "categoryId")
         var category: Category,
 
         @Id

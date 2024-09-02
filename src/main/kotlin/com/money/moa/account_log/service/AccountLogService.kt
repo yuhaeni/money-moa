@@ -26,6 +26,6 @@ class AccountLogService @Autowired constructor(
 
     fun findAccountLog(accountLogFindRequest: AccountLogFindRequest): ArrayList<AccountLog> {
         val member = memberRepository.findByIdOrNull(accountLogFindRequest.memberId) ?: throw IllegalStateException("member not found")
-        return accountLogRepository.findAccountLogByMember(member)
+        return accountLogRepository.findAccountLog(member)
     }
 }
