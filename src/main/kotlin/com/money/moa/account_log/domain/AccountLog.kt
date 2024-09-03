@@ -1,5 +1,6 @@
 package com.money.moa.account_log.domain
 
+import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.category.domain.Category
 import com.money.moa.common.domain.BaseEntity
 import com.money.moa.member.domain.Member
@@ -32,4 +33,14 @@ class AccountLog(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var accountLogId: Long? = null
-) : BaseEntity()
+) : BaseEntity() {
+        fun fromEntity(): AccountLogFindResponse {
+                return AccountLogFindResponse(
+                        date = date,
+                        money = money,
+                        detail = detail,
+                        categoryName = category.categoryName,
+                        categoryType = category.categoryType
+                )
+        }
+}

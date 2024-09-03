@@ -1,8 +1,9 @@
 package com.money.moa.account_log.controller
 
 import com.money.moa.account_log.domain.AccountLog
-import com.money.moa.account_log.dto.AccountLogFindRequest
-import com.money.moa.account_log.dto.AccountLogSaveRequest
+import com.money.moa.account_log.dto.request.AccountLogFindRequest
+import com.money.moa.account_log.dto.request.AccountLogSaveRequest
+import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.account_log.service.AccountLogService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,7 +22,7 @@ class AccountLogController (
     }
 
     @GetMapping
-    fun findAccountLog(@RequestBody accountLogFindRequest: AccountLogFindRequest): ArrayList<AccountLog> {
+    fun findAccountLog(@RequestBody accountLogFindRequest: AccountLogFindRequest): List<AccountLogFindResponse> {
         return accountLogService.findAccountLog(accountLogFindRequest)
     }
 }

@@ -1,6 +1,6 @@
 package com.money.moa.member.controller
 
-import com.money.moa.member.dto.MemberSaveRequest
+import com.money.moa.member.dto.request.MemberSaveRequest
 import com.money.moa.member.service.MemberService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

@@ -1,7 +1,7 @@
 package com.money.moa.member.service
 
 import com.money.moa.member.domain.MemberRepository
-import com.money.moa.member.dto.MemberSaveRequest
+import com.money.moa.member.dto.request.MemberSaveRequest
 import org.springframework.stereotype.Service
 
 @Service

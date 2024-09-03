@@ -1,4 +1,4 @@
-package com.money.moa.account_log.dto
+package com.money.moa.account_log.dto.request
 
 import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.category.domain.Category

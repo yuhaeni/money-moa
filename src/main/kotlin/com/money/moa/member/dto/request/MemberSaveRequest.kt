@@ -1,4 +1,4 @@
-package com.money.moa.member.dto
+package com.money.moa.member.dto.request
 
 import com.money.moa.member.domain.Member
 

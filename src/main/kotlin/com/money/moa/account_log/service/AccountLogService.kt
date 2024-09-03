@@ -2,8 +2,9 @@ package com.money.moa.account_log.service
 
 import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.account_log.domain.AccountLogRepository
-import com.money.moa.account_log.dto.AccountLogFindRequest
-import com.money.moa.account_log.dto.AccountLogSaveRequest
+import com.money.moa.account_log.dto.request.AccountLogFindRequest
+import com.money.moa.account_log.dto.request.AccountLogSaveRequest
+import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.category.domain.Category
 import com.money.moa.category.domain.CategoryRepository
 import com.money.moa.member.domain.Member
@@ -24,8 +25,9 @@ class AccountLogService @Autowired constructor(
         accountLogRepository.save(accountLogSaveRequest.toEntity(member, category))
     }
 
-    fun findAccountLog(accountLogFindRequest: AccountLogFindRequest): ArrayList<AccountLog> {
+    fun findAccountLog(accountLogFindRequest: AccountLogFindRequest): List<AccountLogFindResponse> {
         val member = memberRepository.findByIdOrNull(accountLogFindRequest.memberId) ?: throw IllegalStateException("member not found")
-        return accountLogRepository.findAccountLog(member)
+        val accountLogList: ArrayList<AccountLog> =  accountLogRepository.findAccountLog(member)
+        return accountLogList.map { it.fromEntity() }.toList()
     }
 }
