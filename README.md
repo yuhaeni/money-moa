@@ -1,14 +1,15 @@
-# 모아이
-A brief description of what this project does and who it's for.
+# 돈 모아 (money-moa)
+
 
 ## Introduction
 
-해당 프로젝트는 Java17, Spring boot3.3.1로 구현되었습니다.\
+소비 패턴 기록하여 지출을 줄이기 위한 가계부 앱입니다.
 영혼까지 끌어모아..!
 
-
 ## skils
-
+<div align=center> 
+<img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white">
+</div>
 
 ## domains
 
