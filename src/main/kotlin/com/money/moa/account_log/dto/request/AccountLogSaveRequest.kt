@@ -11,7 +11,7 @@ class AccountLogSaveRequest(
         var money: BigInteger,
         var detail: String,
         var memberId: Long,
-        var categoryId: Long
+        var categoryId: Long,
 ) {
     fun toEntity(member: Member, category: Category): AccountLog {
         return AccountLog(
