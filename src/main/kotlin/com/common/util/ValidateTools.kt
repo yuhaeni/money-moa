@@ -12,7 +12,7 @@ object ValidateTools {
     fun isValidPattern(input: String?): Boolean {
         if (input.isNullOrEmpty()) return false
 
-        val regex = "^[a-zA-Z0-9]+$".toRegex()
+        val regex = VALID_PATTERN_REGEX.toRegex()
         return regex.matches(input)
     }
 
