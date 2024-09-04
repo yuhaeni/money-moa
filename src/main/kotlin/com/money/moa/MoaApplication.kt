@@ -17,5 +17,5 @@ fun main(args: Array<String>) {
     val matches = validPatternRegex.matches(a)
     val validPattern = ValidateTools.isValidPattern(a)
     if (matches == validPattern)
-        println("good")
+        println("hi kotmul")
 }
