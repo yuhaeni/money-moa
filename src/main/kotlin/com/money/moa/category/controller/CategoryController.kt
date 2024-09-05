@@ -3,6 +3,8 @@ package com.money.moa.category.controller
 import com.money.moa.category.dto.CategoryFindResponse
 import com.money.moa.category.dto.CategorySaveRequest
 import com.money.moa.category.service.CategoryService
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,8 +17,10 @@ class CategoryController(
         private val categoryService: CategoryService
 ) {
     @PostMapping
+    @Secured("ROLE_ADMIN")
     fun saveCategory(@RequestBody categorySaveRequest: CategorySaveRequest) {
-       categoryService.saveCategory(categorySaveRequest)
+       // TODO 관리자 권한만 가능
+        categoryService.saveCategory(categorySaveRequest)
     }
 
     @GetMapping
