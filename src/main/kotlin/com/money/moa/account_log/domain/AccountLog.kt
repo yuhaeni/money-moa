@@ -1,17 +1,20 @@
 package com.money.moa.account_log.domain
 
+import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.category.domain.Category
 import com.money.moa.common.domain.BaseEntity
 import com.money.moa.member.domain.Member
 import jakarta.persistence.*
 import lombok.Getter
+import org.hibernate.annotations.DynamicUpdate
 import java.math.BigInteger
 import java.time.LocalDate
 
 @Table
 @Entity
 @Getter
+@DynamicUpdate
 class AccountLog(
         @Column
         var date: LocalDate,
@@ -34,13 +37,19 @@ class AccountLog(
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var accountLogId: Long? = null
 ) : BaseEntity() {
-        fun fromEntity(): AccountLogFindResponse {
-                return AccountLogFindResponse(
-                        date = date,
-                        money = money,
-                        detail = detail,
-                        categoryName = category.categoryName,
-                        categoryType = category.categoryType
-                )
-        }
+    fun fromEntity(): AccountLogFindResponse {
+        return AccountLogFindResponse(
+                date = date,
+                money = money,
+                detail = detail,
+                categoryName = category.categoryName,
+                categoryType = category.categoryType
+        )
+    }
+
+    fun updateAccountLog(accountLogUpdateRequest: AccountLogUpdateRequest) {
+        date = accountLogUpdateRequest.date
+        money = accountLogUpdateRequest.money
+        detail = accountLogUpdateRequest.detail
+    }
 }
