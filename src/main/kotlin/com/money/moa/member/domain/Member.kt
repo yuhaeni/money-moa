@@ -3,6 +3,7 @@ package com.money.moa.member.domain
 import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.common.domain.BaseEntity
 import com.money.moa.common.enums.Role
+import com.money.moa.member.dto.response.MemberFindResponse
 import jakarta.persistence.*
 import lombok.Getter
 
@@ -25,4 +26,14 @@ class Member(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val memberId: Long? = null
-) : BaseEntity()
+) : BaseEntity() {
+    fun fromEntity(): MemberFindResponse {
+        return MemberFindResponse(
+                email = email
+                ,password = password
+                ,name = name
+                ,role = role
+                ,memberId = memberId
+        )
+    }
+}
