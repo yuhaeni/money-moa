@@ -15,7 +15,7 @@ class MemberManager(
             return false
         }
 
-        val member: Member? = memberRepository.findByEmail(email)
+        val member: Member? = email?.let { memberRepository.findByEmail(it) }
         return member != null
     }
 
