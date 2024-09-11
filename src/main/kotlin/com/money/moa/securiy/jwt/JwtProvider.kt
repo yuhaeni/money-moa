@@ -1,21 +1,29 @@
 package com.money.moa.securiy.jwt
 
+import com.money.moa.common.util.AES256
 import com.money.moa.redis.util.RedisUtil
+import com.money.moa.securiy.CustomUserDetails
 import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
-import io.jsonwebtoken.io.Encoders
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.crypto.Cipher
-import javax.crypto.spec.SecretKeySpec
+import kotlin.collections.ArrayList
 
 @Component
 class JwtProvider(
         private val redisUtil: RedisUtil,
+        private val aeS256: AES256,
         @Value("\${jwt.secret-key}")
         var SECRET_KEY: String,
 
@@ -34,8 +42,6 @@ class JwtProvider(
         @Value("\${jwt.refresh.token-header-name}")
         var REFRESH_TOKEN_HEADER_NAME: String,
 ) {
-    // 출처: https://velog.io/@kimjiwonpg98/javakotlin-jwt-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0
-
     private var DECODE_SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY))
 
     /**
@@ -48,6 +54,9 @@ class JwtProvider(
         val jwtDto = getTokenDto(response, claims)
         saveAccessTokenToHeader(response, jwtDto.accessToken)
         saveRefreshTokenToRedis(claims, jwtDto.refreshToken)
+
+        val authentication = getAuthentication(jwtDto.refreshToken)
+        SecurityContextHolder.getContext().authentication = authentication
     }
 
 
@@ -73,6 +82,7 @@ class JwtProvider(
      */
     fun getTokenDto(response: HttpServletResponse, claims: Claims): JwtDto {
 
+        // TODO DateTool 추가
         val accessCalendar = Calendar.getInstance()
         val refreshCalendar = Calendar.getInstance()
         accessCalendar.timeInMillis = accessCalendar.timeInMillis + Integer.parseInt(ACCESS_EXPIRE_MILLISECONDS, 10);
@@ -112,7 +122,11 @@ class JwtProvider(
      * @param token
      */
     fun saveAccessTokenToHeader(response: HttpServletResponse, token: String) {
-        response.setHeader(ACCESS_TOKEN_HEADER_NAME, encryptToken(token))
+        try {
+            response.setHeader(ACCESS_TOKEN_HEADER_NAME, encryptToken(token))
+        } catch (e: Exception) {
+            throw IllegalArgumentException("encrypt token fail")
+        }
     }
 
     /**
@@ -122,17 +136,12 @@ class JwtProvider(
      * @param token
      */
     fun saveRefreshTokenToRedis(claims: Claims, token: String) {
-        redisUtil.setRedisValueWithTimeout(REFRESH_TOKEN_HEADER_NAME.plus(":").plus(claims.subject), encryptToken(token), REFRESH_EXPIRE_MILLISECONDS.toLong())
+        encryptToken(token)?.let { redisUtil.setRedisValueWithTimeout(REFRESH_TOKEN_HEADER_NAME.plus(":").plus(claims.subject), it, REFRESH_EXPIRE_MILLISECONDS.toLong()) }
     }
 
-    private fun encryptToken(token: String): String {
-        val keySpec = SecretKeySpec(ENCRYPT_KEY.toByteArray(), "AES")
-        val cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING")
-        cipher.init(Cipher.ENCRYPT_MODE, keySpec)
-        val ciphertext = cipher.doFinal(token.toByteArray())
-        val encodedByte = Encoders.BASE64.encode(ciphertext)
-
-        return encodedByte.toString()
+    private fun encryptToken(token: String): String? {
+        aeS256.init(ENCRYPT_KEY)
+        return aeS256.encrypt(token)
     }
 
     /**
@@ -147,4 +156,84 @@ class JwtProvider(
                 .add("authorities", authorities)
                 .build()
     }
+
+
+    /**
+     * 토큰 검증
+     *
+     * @param token
+     * @return 유효한 토큰이면 true
+     */
+    fun validateToken(token: String) {
+        try {
+            extractAllClaims(token)
+        } catch (e: ExpiredJwtException) {
+            throw e
+        }
+    }
+
+    /**
+     * 헤더에서 access-token 추출
+     *
+     * @param request
+     * @return access-token
+     */
+    fun resolveAccessTokenInHeader(request: HttpServletRequest): String {
+        return request.getHeader(ACCESS_TOKEN_HEADER_NAME)
+    }
+
+    /**
+     * reids에서 refresh-token 추출
+     *
+     * @param request
+     * @return access-token
+     */
+    fun resolveRefreshTokenInRedis(subject: String): String {
+        return redisUtil.getRedisValue(subject)
+    }
+
+    /**
+     * 토큰 복호화
+     *
+     * @param encryptToken
+     * @return 복호화된 token
+     */
+    fun decryptToken(encryptToken: String): String {
+        try {
+            aeS256.init(ENCRYPT_KEY)
+            return aeS256.encrypt(encryptToken)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("decrypt token fail")
+        }
+    }
+
+    /**
+     * 스프링 시큐리티 검증
+     *
+     * @param token
+     * @return 복호화된 token
+     */
+    fun getAuthentication(token: String): Authentication {
+        val jwtClaims = extractAllClaims(token)
+        val userDetails = getUserDetails(jwtClaims.payload)
+
+        return UsernamePasswordAuthenticationToken(userDetails, userDetails.authorities)
+    }
+
+    fun getUserDetails(claims: Claims): UserDetails {
+        val authorities = ArrayList<GrantedAuthority>()
+        if (claims.containsKey("authorities")) {
+            val authoritiesList = listOf(claims["authorities"])
+            for (authority in authoritiesList) {
+                authorities.add(SimpleGrantedAuthority(authority.toString()))
+            }
+        }
+
+        return CustomUserDetails(
+                userName = claims.subject,
+                userPassword = "",
+                authorities = authorities
+        )
+    }
+
 }

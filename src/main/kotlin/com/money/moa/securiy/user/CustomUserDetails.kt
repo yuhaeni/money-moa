@@ -6,29 +6,14 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-class CustomUserDetails(
+class CustomUserDetails (
         val userName: String,
         val userPassword: String,
-        val role: Role
+        val authorities: ArrayList<GrantedAuthority>
 ) : UserDetails {
 
-    companion object {
-        fun from(member: Member): CustomUserDetails {
-            return with(member) {
-                CustomUserDetails(
-                        userName = email,
-                        userPassword = password,
-                        role = role,
-                )
-            }
-        }
-    }
-
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        val authorities = ArrayList<GrantedAuthority>()
-        authorities.add(SimpleGrantedAuthority(role.toString()))
-        return authorities
-    }
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
+            arrayListOf(SimpleGrantedAuthority(Role.USER.toString()))
 
     override fun getPassword(): String {
         return userPassword

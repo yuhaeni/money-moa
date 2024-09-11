@@ -4,6 +4,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.ValueOperations
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
+
 @Component
 class RedisUtil(private val redisTemplate: StringRedisTemplate) {
 
@@ -12,6 +13,10 @@ class RedisUtil(private val redisTemplate: StringRedisTemplate) {
     }
 
     fun setRedisValueWithTimeout(key: String): String {
+        return redisTemplate.opsForValue().get(key).orEmpty()
+    }
+
+    fun getRedisValue(key: String): String {
         return redisTemplate.opsForValue().get(key).orEmpty()
     }
 

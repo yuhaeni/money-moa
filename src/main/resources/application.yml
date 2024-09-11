@@ -22,7 +22,7 @@ spring:
 # web security config
 jwt:
   secret-key: aGFlbmktand0LWxvZ2luLXByai1qd3Qtc2VjcmV0LWtleQo=
-  encrypt-key: aGFlbmktand0LWxv
+  encrypt-key: aGFlbmktand0LWxvZ2luLXByai1qd3QtZW5jcnlwdC1rZXkK
   access:
     token-header-name: Authorization
     expire-milliseconds: 1800000

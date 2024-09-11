@@ -1,18 +1,17 @@
 package com.money.moa.securiy.user
 
+import com.money.moa.common.enums.Role
 import com.money.moa.member.domain.MemberRepository
 import com.money.moa.securiy.CustomUserDetails
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class CustomUserDetailsService(private val memberRepository: MemberRepository) : UserDetailsService {
-    // 출처:: https://anomie7.tistory.com/65
     override fun loadUserByUsername(username: String): CustomUserDetails {
-        return memberRepository.findByEmail(username)?.let { CustomUserDetails.from(it) }
-                ?: throw UsernameNotFoundException("$username Can Not Found")
+        val member = memberRepository.findByEmail(username) ?: throw UsernameNotFoundException("존재하지 않는 username 입니다.")
+        return CustomUserDetails(member.email, member.password, arrayListOf(SimpleGrantedAuthority(member.role.toString())))
     }
 }
