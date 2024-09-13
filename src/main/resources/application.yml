@@ -18,6 +18,11 @@ spring:
     properties:
       format_sql: true
     show-sql: true
+  # redis
+  data:
+    redis:
+      password: gosl111
+      port: 6379
 
 # web security config
 jwt:
@@ -31,8 +36,3 @@ jwt:
     expire-milliseconds: 3600000
     token-header-name: Authorization-Refresh
 
-# redis
-  data:
-    redis:
-      password: gosl111
-      port: 6379

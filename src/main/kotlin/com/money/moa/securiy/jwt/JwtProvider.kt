@@ -164,12 +164,29 @@ class JwtProvider(
      * @param token
      * @return 유효한 토큰이면 true
      */
-    fun validateToken(token: String) {
+    fun validateToken(token: String): Boolean {
+        if (isBlackListToken(token)) {
+            return false
+        }
+
         try {
             extractAllClaims(token)
         } catch (e: ExpiredJwtException) {
             throw e
         }
+
+        return true
+    }
+
+    /**
+     * 블랙리스트 토큰인지 확인
+     *
+     * @param token
+     * @return 블랙리스트 토큰이면 true
+     */
+    fun isBlackListToken(token: String): Boolean {
+        val value = redisUtil.getRedisValue(token)
+        return (value.isNotBlank() && value == "LOGOUT")
     }
 
     /**
@@ -179,7 +196,7 @@ class JwtProvider(
      * @return access-token
      */
     fun resolveAccessTokenInHeader(request: HttpServletRequest): String {
-        return request.getHeader(ACCESS_TOKEN_HEADER_NAME)
+        return request.getHeader(ACCESS_TOKEN_HEADER_NAME).orEmpty()
     }
 
     /**
@@ -199,9 +216,12 @@ class JwtProvider(
      * @return 복호화된 token
      */
     fun decryptToken(encryptToken: String): String {
+        // TODO 수정 필요
+
+        println(encryptToken)
         try {
             aeS256.init(ENCRYPT_KEY)
-            return aeS256.encrypt(encryptToken)
+            return aeS256.decrypt(encryptToken)
         } catch (e: Exception) {
             throw IllegalArgumentException("decrypt token fail")
         }
@@ -220,6 +240,12 @@ class JwtProvider(
         return UsernamePasswordAuthenticationToken(userDetails, userDetails.authorities)
     }
 
+    /**
+     * Claims 에서 UserDetails 추출
+     *
+     * @param claims
+     * @return UserDetails
+     */
     fun getUserDetails(claims: Claims): UserDetails {
         val authorities = ArrayList<GrantedAuthority>()
         if (claims.containsKey("authorities")) {
@@ -236,4 +262,67 @@ class JwtProvider(
         )
     }
 
+    /**
+     * 토큰 제거
+     *
+     * @param request
+     * @param response
+     */
+    fun destroyToken(request: HttpServletRequest, response: HttpServletResponse, subject: String) {
+        removeAuthentication(request, response)
+        redisUtil.removeRedisValue(subject)
+    }
+
+    /**
+     * 인증 제거
+     *
+     * @param request
+     * @param response
+     */
+    fun removeAuthentication(request: HttpServletRequest, response: HttpServletResponse) {
+        SecurityContextHolder.clearContext()
+        request.session.invalidate()
+        response.setHeader(ACCESS_TOKEN_HEADER_NAME, "")
+    }
+
+    /**
+     * redis에 블랙리스트 토큰 등록
+     *
+     * @param request
+     */
+    fun setBlackListToken(token: String) {
+        val jwtClaims = extractAllClaims(token)
+        redisUtil.modifyRedisValue(REFRESH_TOKEN_HEADER_NAME.plus(":").plus(jwtClaims.payload), "LOGOUT")
+    }
+
+    /**
+     * 필터에서 jwt 인증 유효성 확인
+     *
+     * @param request
+     * @param response
+     */
+    fun filterValidator(request: HttpServletRequest, response: HttpServletResponse) {
+        var encryptAccessToken = resolveAccessTokenInHeader(request)
+        if (
+                encryptAccessToken.isNotBlank()
+                && encryptAccessToken.startsWith("Bearer ")
+        ) {
+            encryptAccessToken = encryptAccessToken.replace("Bearer ", "").trim()
+            val accessToken = decryptToken(encryptAccessToken)
+
+            try {
+                if (validateToken(accessToken)) {
+                    val authentication = getAuthentication(accessToken)
+                    SecurityContextHolder.getContext().authentication = authentication
+                }
+            } catch (e: ExpiredJwtException) {
+                removeAuthentication(request, response)
+            } catch (e: Exception) {
+                removeAuthentication(request, response)
+                e.printStackTrace()
+                throw Exception(e)
+            }
+        }
+
+    }
 }

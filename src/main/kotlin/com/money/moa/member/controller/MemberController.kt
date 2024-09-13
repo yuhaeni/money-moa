@@ -16,13 +16,5 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController(
         private val memberService: MemberService
 ) {
-    @GetMapping("/login")
-    fun login(response: HttpServletResponse, @RequestBody memberFindRequest: MemberFindRequest) {
-        memberService.login(response, memberFindRequest)
-    }
 
-    @PostMapping
-    fun saveMember(@RequestBody memberSaveRequest: MemberSaveRequest) {
-        memberService.saveMember(memberSaveRequest)
-    }
 }

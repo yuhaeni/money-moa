@@ -17,7 +17,6 @@ class CategoryController(
         private val categoryService: CategoryService
 ) {
     @PostMapping
-    @Secured("ROLE_ADMIN")
     fun saveCategory(@RequestBody categorySaveRequest: CategorySaveRequest) {
        // TODO 관리자 권한만 가능
         categoryService.saveCategory(categorySaveRequest)

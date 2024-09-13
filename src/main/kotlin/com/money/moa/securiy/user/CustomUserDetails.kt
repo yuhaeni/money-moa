@@ -12,8 +12,10 @@ class CustomUserDetails (
         val authorities: ArrayList<GrantedAuthority>
 ) : UserDetails {
 
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
-            arrayListOf(SimpleGrantedAuthority(Role.USER.toString()))
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        return authorities
+    }
+
 
     override fun getPassword(): String {
         return userPassword

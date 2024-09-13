@@ -58,7 +58,7 @@ class AES256 {
         c.init(Cipher.DECRYPT_MODE, keySpec, IvParameterSpec(iv.toByteArray()))
         val byteStr = Decoders.BASE64.decode(str)
         val byteArray = c.doFinal(byteStr)
-        return byteArray.toString()
+        return String(byteArray)
     }
 
 }

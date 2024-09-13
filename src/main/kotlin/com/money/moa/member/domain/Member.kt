@@ -21,7 +21,7 @@ class Member(
         var password: String,
 
         @Enumerated(EnumType.STRING)
-        var role: Role = Role.USER,
+        var role: Role = Role.ADMIN,
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

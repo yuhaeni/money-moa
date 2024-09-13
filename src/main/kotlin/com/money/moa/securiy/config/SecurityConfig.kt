@@ -1,7 +1,12 @@
-package com.money.moa.securiy
+package com.money.moa.securiy.config
 
+import com.money.moa.common.enums.Role
+import com.money.moa.securiy.filter.JwtAuthFilter
+import com.money.moa.securiy.interceptor.AuthInterceptor
+import com.money.moa.securiy.jwt.JwtProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -17,7 +22,6 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 class SecurityConfig {
-    // 출처: https://growingsaja.tistory.com/1025
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
@@ -33,8 +37,9 @@ class SecurityConfig {
                 }
                 .authorizeHttpRequests { authorizeHttpRequests ->
                     authorizeHttpRequests
-                            .requestMatchers("/api/v1/member/**").permitAll()
-                            .requestMatchers("/api/v1/category/**").permitAll()
+                            .requestMatchers("/login", "/join", "/api/v1/account-log/**", "/api/v1/category/**").permitAll()
+//                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasRole(Role.ADMIN.toString())
+//                            .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
                 }
 
         return http.build()
@@ -43,5 +48,15 @@ class SecurityConfig {
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder()
+    }
+
+    @Bean
+    fun authInterceptor(jwtProvider: JwtProvider): AuthInterceptor {
+        return AuthInterceptor(jwtProvider)
+    }
+
+    @Bean
+    fun jwtAuthFilter(jwtProvider: JwtProvider): JwtAuthFilter {
+        return JwtAuthFilter(jwtProvider)
     }
 }
