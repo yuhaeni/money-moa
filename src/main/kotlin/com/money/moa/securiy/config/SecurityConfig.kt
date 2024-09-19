@@ -35,11 +35,13 @@ class SecurityConfig {
                 .headers { headerConfig: HeadersConfigurer<HttpSecurity> ->
                     headerConfig.frameOptions { frameOptionsConfig -> frameOptionsConfig.disable() }
                 }
+                .anonymous { anonymousConfig -> anonymousConfig.disable() }
                 .authorizeHttpRequests { authorizeHttpRequests ->
                     authorizeHttpRequests
-                            .requestMatchers("/login", "/join", "/api/v1/account-log/**", "/api/v1/category/**").permitAll()
-//                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasRole(Role.ADMIN.toString())
-//                            .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
+                            .requestMatchers("/login", "/join", "/api/v1/account-log/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasRole(Role.ADMIN.toString())
+//                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasAnyAuthority("ROLE_" + Role.ADMIN.toString())
+                            .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
                 }
 
         return http.build()

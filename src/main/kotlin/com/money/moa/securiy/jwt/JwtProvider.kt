@@ -3,11 +3,13 @@ package com.money.moa.securiy.jwt
 import com.money.moa.common.util.AES256
 import com.money.moa.redis.util.RedisUtil
 import com.money.moa.securiy.CustomUserDetails
+import com.money.moa.securiy.user.CustomUserDetailsService
 import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -21,9 +23,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Component
-class JwtProvider(
+class JwtProvider @Autowired constructor(
         private val redisUtil: RedisUtil,
         private val aeS256: AES256,
+        private val userDetailsService: CustomUserDetailsService,
         @Value("\${jwt.secret-key}")
         var SECRET_KEY: String,
 
@@ -81,8 +84,6 @@ class JwtProvider(
      * @return JwtDto
      */
     fun getTokenDto(response: HttpServletResponse, claims: Claims): JwtDto {
-
-        // TODO DateTool 추가
         val accessCalendar = Calendar.getInstance()
         val refreshCalendar = Calendar.getInstance()
         accessCalendar.timeInMillis = accessCalendar.timeInMillis + Integer.parseInt(ACCESS_EXPIRE_MILLISECONDS, 10);
@@ -216,9 +217,6 @@ class JwtProvider(
      * @return 복호화된 token
      */
     fun decryptToken(encryptToken: String): String {
-        // TODO 수정 필요
-
-        println(encryptToken)
         try {
             aeS256.init(ENCRYPT_KEY)
             return aeS256.decrypt(encryptToken)
@@ -236,8 +234,7 @@ class JwtProvider(
     fun getAuthentication(token: String): Authentication {
         val jwtClaims = extractAllClaims(token)
         val userDetails = getUserDetails(jwtClaims.payload)
-
-        return UsernamePasswordAuthenticationToken(userDetails, userDetails.authorities)
+        return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
     }
 
     /**

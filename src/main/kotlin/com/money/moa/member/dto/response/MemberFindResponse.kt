@@ -6,6 +6,6 @@ class MemberFindResponse(
         var email: String,
         var password: String,
         var name: String,
-        var role: Role,
+        var role: String,
         var memberId: Long?
 )

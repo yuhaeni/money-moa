@@ -7,7 +7,7 @@ class MemberSaveRequest(
         var email: String,
         var name: String,
         var password: String,
-        var role: Role
+        var role: String
 ) {
     fun toEntity(): Member {
         return Member(

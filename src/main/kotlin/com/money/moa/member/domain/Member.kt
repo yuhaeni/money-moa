@@ -20,8 +20,10 @@ class Member(
         @Column
         var password: String,
 
-        @Enumerated(EnumType.STRING)
-        var role: Role = Role.ADMIN,
+//        @Enumerated(EnumType.STRING)
+//        var role: Role = Role.ADMIN,
+        @Column
+        var role: String,
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +31,7 @@ class Member(
 ) : BaseEntity() {
     fun fromEntity(): MemberFindResponse {
         return MemberFindResponse(
-                email = email
-                ,password = password
-                ,name = name
-                ,role = role
-                ,memberId = memberId
+                email = email, password = password, name = name, role = role, memberId = memberId
         )
     }
 }
