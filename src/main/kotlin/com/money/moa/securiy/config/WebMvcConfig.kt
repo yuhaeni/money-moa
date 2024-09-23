@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebMvcConfig(private val authInterceptor: AuthInterceptor) : WebMvcConfigurer {
     companion object {
-        val ADD_ENDPOINT_LIST: ArrayList<String> = arrayListOf("api/v1/category", "/api/v1/account-log")
+        val ADD_ENDPOINT_LIST: ArrayList<String> = arrayListOf("/api/v1/category", "/api/v1/account-log")
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {

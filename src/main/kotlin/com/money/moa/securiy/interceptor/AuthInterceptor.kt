@@ -11,12 +11,12 @@ import java.security.SignatureException
 @Configuration
 class AuthInterceptor(private val jwtProvider: JwtProvider) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val encryptAccessToken = jwtProvider.resolveAccessTokenInHeader(request)
+        var encryptAccessToken = jwtProvider.resolveAccessTokenInHeader(request)
         if (encryptAccessToken.isBlank()) {
             return false
         }
 
-        encryptAccessToken.replace("Bearer ", "")
+        encryptAccessToken = encryptAccessToken.replace("Bearer ", "")
         val accessToken = jwtProvider.decryptToken(encryptAccessToken)
         try {
             val isValidateToken = jwtProvider.validateToken(accessToken)

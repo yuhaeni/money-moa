@@ -6,6 +6,7 @@ import com.money.moa.account_log.dto.request.AccountLogSaveRequest
 import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.account_log.service.AccountLogService
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -15,22 +16,22 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(value = ["/api/v1/account-log"])
-class AccountLogController (
+class AccountLogController(
         private val accountLogService: AccountLogService
-){
+) {
     @PostMapping
-    fun saveAccountLog(@RequestBody accountLogSaveRequest: AccountLogSaveRequest){
-        accountLogService.saveAccountLog(accountLogSaveRequest)
+    fun saveAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogSaveRequest: AccountLogSaveRequest) {
+        accountLogService.saveAccountLog(httpServletRequest, accountLogSaveRequest)
     }
 
     @GetMapping
-    fun findAccountLog(@RequestBody accountLogFindRequest: AccountLogFindRequest): List<AccountLogFindResponse> {
-        return accountLogService.findAccountLog(accountLogFindRequest)
+    fun findAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogFindRequest: AccountLogFindRequest): List<AccountLogFindResponse> {
+        return accountLogService.findAccountLog(httpServletRequest, accountLogFindRequest)
     }
 
     @PutMapping
-    fun updateAccountLog(@RequestBody accountLogUpdateRequest: AccountLogUpdateRequest) {
-        return accountLogService.updateAccountLog(accountLogUpdateRequest)
+    fun updateAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogUpdateRequest: AccountLogUpdateRequest) {
+        return accountLogService.updateAccountLog(httpServletRequest, accountLogUpdateRequest)
     }
 
 }
