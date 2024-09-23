@@ -7,28 +7,23 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisPassword
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
-import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.serializer.StringRedisSerializer
+import org.springframework.data.redis.core.StringRedisTemplate
 
 @Configuration
 class RedisConfig(private val redisProperties: RedisProperties) {
+
     @Bean
     fun redisConnectionFactory(): RedisConnectionFactory {
-        val redisStandaloneConfiguration: RedisStandaloneConfiguration = RedisStandaloneConfiguration()
-        redisStandaloneConfiguration.hostName = redisProperties.host
-        redisStandaloneConfiguration.port = redisProperties.port
-        redisStandaloneConfiguration.password = RedisPassword.of(redisProperties.password)
+        val redisConfig = RedisStandaloneConfiguration()
+        redisConfig.port = redisProperties.port
+        redisConfig.hostName = redisProperties.host
+        redisConfig.password = RedisPassword.of(redisProperties.password)
 
-        return LettuceConnectionFactory(redisStandaloneConfiguration)
+        return LettuceConnectionFactory(redisConfig)
     }
 
     @Bean
-    fun redisTemplate(): RedisTemplate<String, Any>? {
-        val redisTemplate = RedisTemplate<String, Any>()
-        redisTemplate.keySerializer = StringRedisSerializer()
-        redisTemplate.valueSerializer = StringRedisSerializer()
-        redisTemplate.connectionFactory = redisConnectionFactory()
-        return redisTemplate
+    fun redisTemplate(): StringRedisTemplate {
+        return StringRedisTemplate(redisConnectionFactory())
     }
-
 }

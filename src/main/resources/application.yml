@@ -1,6 +1,8 @@
 spring:
   application:
     name: moa
+  profiles:
+    active: trace
 
   # Database
   datasource:
@@ -18,11 +20,13 @@ spring:
     properties:
       format_sql: true
     show-sql: true
+
   # redis
   data:
     redis:
-      password: gosl111
       port: 6379
+      password: gosl111
+      host: localhost
 
 # web security config
 jwt:

@@ -6,13 +6,14 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-class CustomUserDetails (
+class CustomUserDetails(
         val userName: String,
         val userPassword: String,
         val authorities: ArrayList<GrantedAuthority>
 ) : UserDetails {
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        println("authorities: " + authorities)
         return authorities
     }
 

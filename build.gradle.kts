@@ -32,6 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-configuration-processor:3.3.0")
 
     // jwt
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
@@ -40,7 +41,6 @@ dependencies {
 
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.session:spring-session-data-redis")
 
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.h2database:h2")

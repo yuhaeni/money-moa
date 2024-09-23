@@ -1,19 +1,13 @@
 package com.money.moa.redis.util
 
 import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.data.redis.core.ValueOperations
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
 class RedisUtil(private val redisTemplate: StringRedisTemplate) {
-
     fun setRedisValueWithTimeout(key: String, value: String, ttl: Long) {
-        this.redisTemplate.opsForValue().set(key, value, ttl)
-    }
-
-    fun setRedisValueWithTimeout(key: String): String {
-        return redisTemplate.opsForValue().get(key).orEmpty()
+        this.redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS)
     }
 
     fun getRedisValue(key: String): String {
@@ -21,10 +15,10 @@ class RedisUtil(private val redisTemplate: StringRedisTemplate) {
     }
 
     fun modifyRedisValue(key: String, value: String) {
-        val valueOperations: ValueOperations<String, String> = redisTemplate.opsForValue();
-        val existingValue: String = valueOperations.get(key).orEmpty();
+        val valueOperations = redisTemplate.opsForValue();
+        val existingValue = valueOperations.get(key).orEmpty()
         if (existingValue.isNotBlank()) {
-            val ttl = redisTemplate.getExpire(key)
+            val ttl = redisTemplate.getExpire(existingValue)
             valueOperations.set(key, value, ttl, TimeUnit.SECONDS)
         }
     }

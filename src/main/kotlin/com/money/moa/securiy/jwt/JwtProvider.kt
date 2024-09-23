@@ -3,14 +3,15 @@ package com.money.moa.securiy.jwt
 import com.money.moa.common.util.AES256
 import com.money.moa.redis.util.RedisUtil
 import com.money.moa.securiy.CustomUserDetails
-import com.money.moa.securiy.user.CustomUserDetailsService
+import com.money.moa.securiy.jwt.properties.JwtProperties
 import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -23,29 +24,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Component
+@Slf4j
 class JwtProvider @Autowired constructor(
         private val redisUtil: RedisUtil,
         private val aeS256: AES256,
-        private val userDetailsService: CustomUserDetailsService,
-        @Value("\${jwt.secret-key}")
-        var SECRET_KEY: String,
-
-        @Value("\${jwt.encrypt-key}")
-        var ENCRYPT_KEY: String,
-
-        @Value("\${jwt.access.expire-milliseconds}")
-        var ACCESS_EXPIRE_MILLISECONDS: String,
-
-        @Value("\${jwt.refresh.expire-milliseconds}")
-        var REFRESH_EXPIRE_MILLISECONDS: String,
-
-        @Value("\${jwt.access.token-header-name}")
-        var ACCESS_TOKEN_HEADER_NAME: String,
-
-        @Value("\${jwt.refresh.token-header-name}")
-        var REFRESH_TOKEN_HEADER_NAME: String,
+        private val jwtProperties: JwtProperties
 ) {
-    private var DECODE_SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY))
+    private var DECODE_SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.secretKey))
 
     /**
      * 토큰 발급
@@ -86,8 +71,8 @@ class JwtProvider @Autowired constructor(
     fun getTokenDto(response: HttpServletResponse, claims: Claims): JwtDto {
         val accessCalendar = Calendar.getInstance()
         val refreshCalendar = Calendar.getInstance()
-        accessCalendar.timeInMillis = accessCalendar.timeInMillis + Integer.parseInt(ACCESS_EXPIRE_MILLISECONDS, 10);
-        refreshCalendar.timeInMillis = refreshCalendar.timeInMillis + Integer.parseInt(REFRESH_EXPIRE_MILLISECONDS, 10);
+        accessCalendar.timeInMillis = accessCalendar.timeInMillis + Integer.parseInt(jwtProperties.access.expireMilliseconds, 10);
+        refreshCalendar.timeInMillis = refreshCalendar.timeInMillis + Integer.parseInt(jwtProperties.refresh.expireMilliseconds, 10);
 
         val accessDate = Date.from(accessCalendar.toInstant())
         val refreshDate = Date.from(refreshCalendar.toInstant())
@@ -124,7 +109,7 @@ class JwtProvider @Autowired constructor(
      */
     fun saveAccessTokenToHeader(response: HttpServletResponse, token: String) {
         try {
-            response.setHeader(ACCESS_TOKEN_HEADER_NAME, encryptToken(token))
+            response.setHeader(jwtProperties.access.tokenHeaderName, encryptToken(token))
         } catch (e: Exception) {
             throw IllegalArgumentException("encrypt token fail")
         }
@@ -137,11 +122,12 @@ class JwtProvider @Autowired constructor(
      * @param token
      */
     fun saveRefreshTokenToRedis(claims: Claims, token: String) {
-        encryptToken(token)?.let { redisUtil.setRedisValueWithTimeout(REFRESH_TOKEN_HEADER_NAME.plus(":").plus(claims.subject), it, REFRESH_EXPIRE_MILLISECONDS.toLong()) }
+        // TODO template not initialized
+        redisUtil.setRedisValueWithTimeout(jwtProperties.refresh.tokenHeaderName.plus(":").plus(claims.subject), token, 180)
     }
 
-    private fun encryptToken(token: String): String? {
-        aeS256.init(ENCRYPT_KEY)
+    private fun encryptToken(token: String): String {
+        aeS256.init(jwtProperties.encryptKey)
         return aeS256.encrypt(token)
     }
 
@@ -197,7 +183,7 @@ class JwtProvider @Autowired constructor(
      * @return access-token
      */
     fun resolveAccessTokenInHeader(request: HttpServletRequest): String {
-        return request.getHeader(ACCESS_TOKEN_HEADER_NAME).orEmpty()
+        return request.getHeader(jwtProperties.access.tokenHeaderName).orEmpty()
     }
 
     /**
@@ -218,7 +204,7 @@ class JwtProvider @Autowired constructor(
      */
     fun decryptToken(encryptToken: String): String {
         try {
-            aeS256.init(ENCRYPT_KEY)
+            jwtProperties.encryptKey.let { aeS256.init(it) }
             return aeS256.decrypt(encryptToken)
         } catch (e: Exception) {
             throw IllegalArgumentException("decrypt token fail")
@@ -279,7 +265,7 @@ class JwtProvider @Autowired constructor(
     fun removeAuthentication(request: HttpServletRequest, response: HttpServletResponse) {
         SecurityContextHolder.clearContext()
         request.session.invalidate()
-        response.setHeader(ACCESS_TOKEN_HEADER_NAME, "")
+        response.setHeader(jwtProperties.access.tokenHeaderName, "")
     }
 
     /**
@@ -289,7 +275,7 @@ class JwtProvider @Autowired constructor(
      */
     fun setBlackListToken(token: String) {
         val jwtClaims = extractAllClaims(token)
-        redisUtil.modifyRedisValue(REFRESH_TOKEN_HEADER_NAME.plus(":").plus(jwtClaims.payload), "LOGOUT")
+        redisUtil.modifyRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(jwtClaims.payload), "LOGOUT")
     }
 
     /**
