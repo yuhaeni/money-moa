@@ -42,6 +42,8 @@ dependencies {
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    implementation("org.apache.commons:commons-lang3:3.14.0")
+
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.h2database:h2")
     annotationProcessor("org.projectlombok:lombok")

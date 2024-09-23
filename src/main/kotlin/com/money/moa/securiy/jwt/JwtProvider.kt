@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.Keys
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.extern.slf4j.Slf4j
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -121,7 +122,7 @@ class JwtProvider @Autowired constructor(
      * @param token
      */
     fun saveRefreshTokenToRedis(claims: Claims, token: String) {
-        redisUtil.setRedisValueWithTimeout(jwtProperties.refresh.tokenHeaderName.plus(":").plus(claims.subject), token, 180)
+        redisUtil.setRedisValueWithTimeout(jwtProperties.refresh.tokenHeaderName.plus(":").plus(claims.subject), encryptToken(token), 180)
     }
 
     private fun encryptToken(token: String): String {
@@ -157,6 +158,8 @@ class JwtProvider @Autowired constructor(
         try {
             extractAllClaims(token)
         } catch (e: ExpiredJwtException) {
+            throw e
+        } catch (e: Exception) {
             throw e
         }
 
@@ -285,7 +288,7 @@ class JwtProvider @Autowired constructor(
     fun filterValidator(request: HttpServletRequest, response: HttpServletResponse) {
         var encryptAccessToken = resolveAccessTokenInHeader(request)
         if (
-                encryptAccessToken.isNotBlank()
+                StringUtils.isNotBlank(encryptAccessToken)
                 && encryptAccessToken.startsWith("Bearer ")
         ) {
             encryptAccessToken = encryptAccessToken.replace("Bearer ", "").trim()
@@ -295,12 +298,18 @@ class JwtProvider @Autowired constructor(
                 if (validateToken(accessToken)) {
                     val authentication = getAuthentication(accessToken)
                     SecurityContextHolder.getContext().authentication = authentication
-                } else {
-                    removeAuthentication(request, response)
                 }
             } catch (e: ExpiredJwtException) {
-                // TODO AccessToken 만료된 경우 refreshToken 검증 -> 유효한 refreshToken인 경우 토큰 재발행
-                removeAuthentication(request, response)
+                val encryptRefreshToken = redisUtil.getRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(e.claims.subject))
+                if (StringUtils.isNotBlank(encryptRefreshToken)) {
+                    val refreshToken = decryptToken(encryptRefreshToken)
+                    if (
+                            StringUtils.equals(refreshToken, accessToken)
+                            && validateToken(refreshToken)
+                    ) {
+                        issueToken(response, e.claims)
+                    }
+                }
             } catch (e: Exception) {
                 removeAuthentication(request, response)
                 e.printStackTrace()
