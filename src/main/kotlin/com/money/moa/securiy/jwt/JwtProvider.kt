@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -122,7 +121,6 @@ class JwtProvider @Autowired constructor(
      * @param token
      */
     fun saveRefreshTokenToRedis(claims: Claims, token: String) {
-        // TODO template not initialized
         redisUtil.setRedisValueWithTimeout(jwtProperties.refresh.tokenHeaderName.plus(":").plus(claims.subject), token, 180)
     }
 
@@ -220,11 +218,12 @@ class JwtProvider @Autowired constructor(
     fun getAuthentication(token: String): Authentication {
         val jwtClaims = extractAllClaims(token)
         val userDetails = getUserDetails(jwtClaims.payload)
+
         return UsernamePasswordAuthenticationToken(userDetails, "", userDetails.authorities)
     }
 
     /**
-     * Claims 에서 UserDetails 추출
+     * Claims(payload) 에서 UserDetails 추출
      *
      * @param claims
      * @return UserDetails
@@ -232,9 +231,8 @@ class JwtProvider @Autowired constructor(
     fun getUserDetails(claims: Claims): UserDetails {
         val authorities = ArrayList<GrantedAuthority>()
         if (claims.containsKey("authorities")) {
-            val authoritiesList = listOf(claims["authorities"])
-            for (authority in authoritiesList) {
-                authorities.add(SimpleGrantedAuthority(authority.toString()))
+            for (authority in (claims["authorities"] as ArrayList<String>)) {
+                authorities.add(SimpleGrantedAuthority(authority))
             }
         }
 
@@ -297,8 +295,11 @@ class JwtProvider @Autowired constructor(
                 if (validateToken(accessToken)) {
                     val authentication = getAuthentication(accessToken)
                     SecurityContextHolder.getContext().authentication = authentication
+                } else {
+                    removeAuthentication(request, response)
                 }
             } catch (e: ExpiredJwtException) {
+                // TODO AccessToken 만료된 경우 refreshToken 검증 -> 유효한 refreshToken인 경우 토큰 재발행
                 removeAuthentication(request, response)
             } catch (e: Exception) {
                 removeAuthentication(request, response)

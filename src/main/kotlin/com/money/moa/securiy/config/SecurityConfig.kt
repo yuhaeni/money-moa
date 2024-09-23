@@ -43,8 +43,7 @@ class SecurityConfig(private val jwtProperties: JwtProperties, private val redis
                 .authorizeHttpRequests { authorizeHttpRequests ->
                     authorizeHttpRequests
                             .requestMatchers("/login", "/join", "/api/v1/account-log/**").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasRole(Role.ADMIN.toString())
-//                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasAnyAuthority("ROLE_" + Role.ADMIN.toString())
+                            .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasAnyAuthority(Role.ADMIN.value())
                             .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
                 }
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter::class.java)

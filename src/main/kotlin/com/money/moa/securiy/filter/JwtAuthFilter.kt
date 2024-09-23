@@ -10,7 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Slf4j
 class JwtAuthFilter(private val jwtProvider: JwtProvider) : OncePerRequestFilter() {
 
-    private val excludeUrls = listOf("/login", "/join")
+    private val excludeUrls = listOf("/join", "/login")
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
 
         try {

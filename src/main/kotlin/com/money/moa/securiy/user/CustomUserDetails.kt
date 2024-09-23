@@ -1,9 +1,6 @@
 package com.money.moa.securiy
 
-import com.money.moa.common.enums.Role
-import com.money.moa.member.domain.Member
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class CustomUserDetails(
@@ -12,11 +9,9 @@ class CustomUserDetails(
         val authorities: ArrayList<GrantedAuthority>
 ) : UserDetails {
 
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        println("authorities: " + authorities)
+    override fun getAuthorities(): MutableCollection<GrantedAuthority> {
         return authorities
     }
-
 
     override fun getPassword(): String {
         return userPassword

@@ -18,7 +18,6 @@ class CategoryController(
 ) {
     @PostMapping
     fun saveCategory(@RequestBody categorySaveRequest: CategorySaveRequest) {
-       // TODO 관리자 권한만 가능
         categoryService.saveCategory(categorySaveRequest)
     }
 
