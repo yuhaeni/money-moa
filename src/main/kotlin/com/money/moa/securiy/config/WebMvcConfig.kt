@@ -1,6 +1,6 @@
 package com.money.moa.securiy.config
 
-import com.common.resolver.CommonHandlerExceptionResolver
+import com.common.exception.resolver.CommonHandlerExceptionResolver
 import com.money.moa.securiy.interceptor.AuthInterceptor
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean

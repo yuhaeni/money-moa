@@ -1,5 +1,6 @@
-package com.common.resolver
+package com.common.exception.resolver
 
+import com.common.exception.enums.ExceptionEnum
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -14,10 +15,9 @@ import java.nio.charset.StandardCharsets
 class CommonHandlerExceptionResolver : AbstractHandlerExceptionResolver() {
     override fun doResolveException(request: HttpServletRequest, response: HttpServletResponse, handler: Any?, ex: java.lang.Exception): ModelAndView? {
         val exceptionClassName = ex.javaClass.getName()
-        if (StringUtils.contains(exceptionClassName, "org.springframework.security.core.userdetails.UsernameNotFoundException")) {
-            response.status = HttpStatus.UNAUTHORIZED.value()
-        } else if (StringUtils.contains(exceptionClassName, "org.springframework.http.converter.HttpMessageNotReadableException")) {
-            response.status = HttpStatus.BAD_REQUEST.value()
+        val exceptionClass = ExceptionEnum.ExceptionClassName.findClassName(exceptionClassName)
+        if (exceptionClass != null) {
+            response.status = exceptionClass.httpStatus
         } else {
             response.status = HttpStatus.INTERNAL_SERVER_ERROR.value()
         }
