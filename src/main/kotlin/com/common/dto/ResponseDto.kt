@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity
 
 
 data class ResponseDto<T>(
-    var code: Int,
-    var message: String? = null,
-    var error: String? = null,
-    var response: T? = null
+        var code: Int,
+        var message: String? = null,
+        var error: String? = null,
+        var response: T? = null
 ) {
 
     constructor(code: Int) : this(code, null, null, null)
@@ -44,7 +44,7 @@ data class ResponseDto<T>(
 
         fun <T> accepted(response: T): ResponseEntity<ResponseDto<T>> {
             return ResponseEntity.accepted()
-                .body(ResponseDto(HttpStatus.ACCEPTED.value(), response))
+                    .body(ResponseDto(HttpStatus.ACCEPTED.value(), response))
         }
 
         fun created(): ResponseEntity<ResponseDto<*>> {
@@ -69,32 +69,32 @@ data class ResponseDto<T>(
 
         fun noContent(): ResponseEntity<ResponseDto<*>> {
             val body: ResponseDto<*> =
-                ResponseDto<Any>(HttpStatus.NO_CONTENT.value(), null, HttpStatus.NO_CONTENT.name)
+                    ResponseDto<Any>(HttpStatus.NO_CONTENT.value(), null, HttpStatus.NO_CONTENT.name)
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(body)
         }
 
         fun <T> noContent(response: T): ResponseEntity<ResponseDto<T>> {
             val body: ResponseDto<T> = ResponseDto<T>(
-                HttpStatus.NO_CONTENT.value(),
-                null,
-                HttpStatus.NO_CONTENT.name,
-                response
+                    HttpStatus.NO_CONTENT.value(),
+                    null,
+                    HttpStatus.NO_CONTENT.name,
+                    response
             )
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(body)
         }
 
         fun unprocessableEntity(): ResponseEntity<ResponseDto<*>> {
             val body: ResponseDto<*> = ResponseDto<Any>(
-                HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                null,
-                HttpStatus.UNPROCESSABLE_ENTITY.name
+                    HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                    null,
+                    HttpStatus.UNPROCESSABLE_ENTITY.name
             )
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(body)
         }
 
         fun <T> unprocessableEntity(response: T): ResponseEntity<ResponseDto<T>> {
             return ResponseEntity.unprocessableEntity()
-                .body(ResponseDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), response))
+                    .body(ResponseDto(HttpStatus.UNPROCESSABLE_ENTITY.value(), response))
         }
     }
 }

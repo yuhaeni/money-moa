@@ -51,7 +51,6 @@ class AuthInterceptor(private val jwtProvider: JwtProvider) : HandlerInterceptor
 
             return false
         } catch (e: Exception) {
-
             jwtProvider.removeAuthentication(request, response)
             return false
         }

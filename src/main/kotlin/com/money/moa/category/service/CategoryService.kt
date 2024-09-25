@@ -11,6 +11,7 @@ class CategoryService(
         private val categoryRepository: CategoryRepository
 ) {
     fun saveCategory(categorySaveRequest: CategorySaveRequest){
+        // TODO 아이콘 이미지 저장
         categoryRepository.save(categorySaveRequest.toEntity())
     }
 

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 @Service
 class CustomUserDetailsService(private val memberRepository: MemberRepository) : UserDetailsService {
     override fun loadUserByUsername(username: String): CustomUserDetails {
-        val member = memberRepository.findByEmail(username) ?: throw UsernameNotFoundException("존재하지 않는 username 입니다.")
+        val member = memberRepository.findByEmail(username) ?: throw UsernameNotFoundException("존재하지 않는 회원 입니다.")
         return CustomUserDetails(member.email, member.password, arrayListOf(SimpleGrantedAuthority(member.role)))
     }
 }

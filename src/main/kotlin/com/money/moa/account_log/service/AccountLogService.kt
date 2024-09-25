@@ -6,6 +6,7 @@ import com.money.moa.account_log.dto.request.AccountLogFindRequest
 import com.money.moa.account_log.dto.request.AccountLogSaveRequest
 import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
+import com.money.moa.account_log.manager.AccountLogManager
 import com.money.moa.category.domain.Category
 import com.money.moa.category.domain.CategoryRepository
 import com.money.moa.member.domain.Member
@@ -21,12 +22,14 @@ import org.springframework.transaction.annotation.Transactional
 class AccountLogService @Autowired constructor(
         private val accountLogRepository: AccountLogRepository,
         private val memberRepository: MemberRepository,
-        private val categoryRepository: CategoryRepository
+        private val categoryRepository: CategoryRepository,
 ) {
     fun saveAccountLog(httpServletRequest: HttpServletRequest, accountLogSaveRequest: AccountLogSaveRequest) {
         val member: Member = getMember(httpServletRequest)
         val category: Category = categoryRepository.findByIdOrNull(accountLogSaveRequest.categoryId)
                 ?: throw IllegalStateException("category not found")
+
+        // TODO 유효성 검증
         accountLogRepository.save(accountLogSaveRequest.toEntity(member, category))
     }
 
@@ -43,6 +46,8 @@ class AccountLogService @Autowired constructor(
                 ?: throw IllegalStateException("account log not found")
         accountLog.updateAccountLog(accountLogUpdateRequest)
     }
+
+    // TODO 가계부 삭제
 
     private fun getMember(httpServletRequest: HttpServletRequest): Member {
         val customUserDetails = httpServletRequest.getAttribute("_memberDetails") as CustomUserDetails

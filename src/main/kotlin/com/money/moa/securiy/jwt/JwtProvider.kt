@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.extern.slf4j.Slf4j
 import org.apache.commons.lang3.StringUtils
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -24,13 +25,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Component
-@Slf4j
 class JwtProvider @Autowired constructor(
         private val redisUtil: RedisUtil,
         private val aeS256: AES256,
         private val jwtProperties: JwtProperties
 ) {
     private var DECODE_SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.secretKey))
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * 토큰 발급
@@ -158,8 +159,10 @@ class JwtProvider @Autowired constructor(
         try {
             extractAllClaims(token)
         } catch (e: ExpiredJwtException) {
+            logger.error("", e)
             throw e
         } catch (e: Exception) {
+            logger.error("", e)
             throw e
         }
 
@@ -208,6 +211,7 @@ class JwtProvider @Autowired constructor(
             jwtProperties.encryptKey.let { aeS256.init(it) }
             return aeS256.decrypt(encryptToken)
         } catch (e: Exception) {
+            logger.error("", e)
             throw IllegalArgumentException("decrypt token fail")
         }
     }
@@ -300,6 +304,7 @@ class JwtProvider @Autowired constructor(
                     SecurityContextHolder.getContext().authentication = authentication
                 }
             } catch (e: ExpiredJwtException) {
+                logger.error("", e)
                 val encryptRefreshToken = redisUtil.getRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(e.claims.subject))
                 if (StringUtils.isNotBlank(encryptRefreshToken)) {
                     val refreshToken = decryptToken(encryptRefreshToken)
@@ -311,6 +316,7 @@ class JwtProvider @Autowired constructor(
                     }
                 }
             } catch (e: Exception) {
+                logger.error("", e)
                 removeAuthentication(request, response)
                 e.printStackTrace()
                 throw Exception(e)

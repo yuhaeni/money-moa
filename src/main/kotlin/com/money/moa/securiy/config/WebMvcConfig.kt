@@ -1,8 +1,11 @@
 package com.money.moa.securiy.config
 
+import com.common.resolver.CommonHandlerExceptionResolver
 import com.money.moa.securiy.interceptor.AuthInterceptor
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -16,5 +19,12 @@ class WebMvcConfig(private val authInterceptor: AuthInterceptor) : WebMvcConfigu
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns(ADD_ENDPOINT_LIST)
                 .excludePathPatterns(PathRequest.toStaticResources().atCommonLocations().toString())
+    }
+
+    @Bean
+    fun commonHandlerExceptionResolver(): CommonHandlerExceptionResolver {
+        val commonHandlerExceptionResolver = CommonHandlerExceptionResolver()
+        commonHandlerExceptionResolver.order = 0
+        return commonHandlerExceptionResolver
     }
 }
