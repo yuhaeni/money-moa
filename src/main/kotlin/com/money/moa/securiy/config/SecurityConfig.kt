@@ -27,7 +27,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class SecurityConfig(private val jwtProperties: JwtProperties, private val redisTemplate: StringRedisTemplate) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        // TODO failureHandler 추가
         http
                 .csrf { csrfConfig: CsrfConfigurer<HttpSecurity> ->
                     csrfConfig.disable()
@@ -42,7 +41,7 @@ class SecurityConfig(private val jwtProperties: JwtProperties, private val redis
                 .anonymous { anonymousConfig -> anonymousConfig.disable() }
                 .authorizeHttpRequests { authorizeHttpRequests ->
                     authorizeHttpRequests
-                            .requestMatchers("/join","/login").permitAll()
+                            .requestMatchers("/join", "/login").permitAll()
                             .requestMatchers("/api/v1/account-log/**").hasAnyAuthority(Role.USER.value())
                             .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasAnyAuthority(Role.ADMIN.value())
                             .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()

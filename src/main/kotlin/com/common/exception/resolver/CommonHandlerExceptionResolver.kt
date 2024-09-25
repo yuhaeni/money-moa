@@ -4,12 +4,10 @@ import com.common.exception.enums.ExceptionEnum
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver
-import java.nio.charset.CharsetEncoder
 import java.nio.charset.StandardCharsets
 
 class CommonHandlerExceptionResolver : AbstractHandlerExceptionResolver() {
