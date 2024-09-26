@@ -10,21 +10,16 @@ import java.time.LocalDate
 
 @Component
 class AccountLogManager {
-    companion object {
-        private val logger = LoggerFactory.getLogger(javaClass)
-        const val FMT_10 = "yyyy-MM-dd"
+    private val logger = LoggerFactory.getLogger(javaClass)
 
-        fun checkBigNumber(number: BigInteger, checkSize: Int): Boolean {
-            return try {
-                return number.toString().length <= checkSize
-            } catch (e: NumberFormatException) {
-                false
-            } catch (e: Exception) {
-                logger.error("", e)
-                false
-            }
+    fun checkBigNumber(number: BigInteger): Boolean {
+        return try {
+            return number.toString().length <= 20
+        } catch (e: NumberFormatException) {
+            false
+        } catch (e: Exception) {
+            logger.error("", e)
+            false
         }
     }
-
-
 }

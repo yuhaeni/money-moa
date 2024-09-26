@@ -1,5 +1,6 @@
 package com.money.moa.account_log.controller
 
+import com.common.dto.ResponseDto
 import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.account_log.dto.request.AccountLogFindRequest
 import com.money.moa.account_log.dto.request.AccountLogSaveRequest
@@ -7,6 +8,7 @@ import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.account_log.service.AccountLogService
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -20,8 +22,8 @@ class AccountLogController(
         private val accountLogService: AccountLogService
 ) {
     @PostMapping
-    fun saveAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogSaveRequest: AccountLogSaveRequest) {
-        accountLogService.saveAccountLog(httpServletRequest, accountLogSaveRequest)
+    fun saveAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogSaveRequest: AccountLogSaveRequest): ResponseEntity<ResponseDto<*>> {
+        return accountLogService.saveAccountLog(httpServletRequest, accountLogSaveRequest)
     }
 
     @GetMapping
@@ -30,7 +32,7 @@ class AccountLogController(
     }
 
     @PutMapping
-    fun updateAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogUpdateRequest: AccountLogUpdateRequest) {
+    fun updateAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogUpdateRequest: AccountLogUpdateRequest): ResponseEntity<ResponseDto<*>> {
         return accountLogService.updateAccountLog(httpServletRequest, accountLogUpdateRequest)
     }
 

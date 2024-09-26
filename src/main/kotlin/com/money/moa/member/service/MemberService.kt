@@ -45,6 +45,7 @@ class MemberService @Autowired constructor(
     }
 
     fun saveMember(memberSaveRequest: MemberSaveRequest): ResponseEntity<out ResponseDto<out Any?>> {
+        // TODO 오류 메세지 반환 델레오에서 어떻게 했는지 확인 필요
         if (!memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
             return ResponseDto.badRequest("이미 존재하는 이메일입니다.")
         }
