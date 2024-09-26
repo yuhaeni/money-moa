@@ -3,7 +3,7 @@ package com.money.moa.account_log.service
 import com.common.dto.ResponseDto
 import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.account_log.domain.AccountLogRepository
-import com.money.moa.account_log.dto.request.AccountLogFindRequest
+import com.money.moa.account_log.dto.request.AccountLogDeleteRequest
 import com.money.moa.account_log.dto.request.AccountLogSaveRequest
 import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
@@ -40,7 +40,7 @@ class AccountLogService @Autowired constructor(
         return ResponseDto.ok()
     }
 
-    fun findAccountLog(httpServletRequest: HttpServletRequest, accountLogFindRequest: AccountLogFindRequest): List<AccountLogFindResponse> {
+    fun findAccountLog(httpServletRequest: HttpServletRequest): List<AccountLogFindResponse> {
         val member: Member = getMember(httpServletRequest)
         val accountLogList: ArrayList<AccountLog> = accountLogRepository.findAccountLog(member)
         return accountLogList.map { it.fromEntity() }.toList()
@@ -58,8 +58,20 @@ class AccountLogService @Autowired constructor(
         return ResponseDto.ok()
     }
 
-    // TODO 가계부 삭제
+    fun deleteAccountLog(httpServletRequest: HttpServletRequest, accountLogDeleteRequest: AccountLogDeleteRequest): ResponseEntity<ResponseDto<*>> {
+        val accountLog = accountLogRepository.findByIdOrNull(accountLogDeleteRequest.accountLogId)
+        if (accountLog == null) {
+            return ResponseDto.badRequest()
+        }
 
+        val member: Member = getMember(httpServletRequest)
+        if (accountLog.member.memberId != member.memberId) {
+            return ResponseDto.badRequest()
+        }
+
+        accountLogRepository.delete(accountLog)
+        return ResponseDto.ok()
+    }
 
     private fun getMember(httpServletRequest: HttpServletRequest): Member {
         val customUserDetails = httpServletRequest.getAttribute("_memberDetails") as CustomUserDetails
