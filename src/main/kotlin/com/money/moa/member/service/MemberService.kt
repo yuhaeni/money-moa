@@ -44,20 +44,16 @@ class MemberService @Autowired constructor(
         return member.fromEntity()
     }
 
-    fun saveMember(memberSaveRequest: MemberSaveRequest) {
-        // TODO 공통 응답 포맷 개발
-        checkMemberSaveRequest(memberSaveRequest)
+    fun saveMember(memberSaveRequest: MemberSaveRequest): ResponseEntity<out ResponseDto<out Any?>> {
+        if (!memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
+            return ResponseDto.badRequest("이미 존재하는 이메일입니다.")
+        }
+        if(!memberManager.checkMemberPassword(memberSaveRequest.password)){
+            return ResponseDto.badRequest("유효하지 않은 비밀번호 입니다.")
+        }
 
         memberSaveRequest.password = passwordEncoder.encode(memberSaveRequest.password)
         memberRepository.save(memberSaveRequest.toEntity());
-    }
-
-    private fun checkMemberSaveRequest(memberSaveRequest: MemberSaveRequest) {
-        if (memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
-            // TODO
-        }
-        if (memberManager.checkMemberPassword(memberSaveRequest.password)) {
-            // TODO
-        }
+        return ResponseDto.ok()
     }
 }

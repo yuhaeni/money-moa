@@ -3,6 +3,7 @@ package com.money.moa.common.manager
 import com.money.moa.common.tool.ValidateTool
 import com.money.moa.member.domain.Member
 import com.money.moa.member.domain.MemberRepository
+import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 
 @Component
@@ -15,8 +16,8 @@ class MemberManager(
             return false
         }
 
-        val member: Member? = email?.let { memberRepository.findByEmail(it) }
-        return member != null
+        val member = email?.let { memberRepository.findByEmail(it) }
+        return member == null
     }
 
     fun checkMemberEmail(email: String?): Boolean {
@@ -35,8 +36,8 @@ class MemberManager(
     }
 
     fun checkMemberPassword(password: String?): Boolean {
-        return !(password.isNullOrBlank()
-                || checkValidMemberPassword(password))
+        return (StringUtils.isNotBlank(password)
+                && checkValidMemberPassword(password))
     }
 
     private fun checkValidMemberPassword(password: String?): Boolean {
