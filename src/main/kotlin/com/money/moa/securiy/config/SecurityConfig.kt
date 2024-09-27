@@ -41,7 +41,7 @@ class SecurityConfig(private val jwtProperties: JwtProperties, private val redis
                 .anonymous { anonymousConfig -> anonymousConfig.disable() }
                 .authorizeHttpRequests { authorizeHttpRequests ->
                     authorizeHttpRequests
-                            .requestMatchers("/join", "/login").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/api/v1/member/**").permitAll()
                             .requestMatchers("/api/v1/account-log/**").hasAnyAuthority(Role.USER.value())
                             .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasAnyAuthority(Role.ADMIN.value())
                             .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
