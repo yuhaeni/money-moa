@@ -53,7 +53,7 @@ data class ResponseDto<T>(
         }
 
         fun <T> created(response: T): ResponseEntity<ResponseDto<T>> {
-            val body = ResponseDto(HttpStatus.OK.value(), response)
+            val body = ResponseDto(HttpStatus.CREATED.value(), response)
             return ResponseEntity.status(HttpStatus.CREATED).body(body)
         }
 

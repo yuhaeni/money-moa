@@ -1,9 +1,8 @@
 package com.money.moa.member.domain
 
-import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.common.domain.BaseEntity
-import com.money.moa.common.enums.Role
 import com.money.moa.member.dto.response.MemberFindResponse
+import com.money.moa.member.dto.response.MemberResponse
 import jakarta.persistence.*
 import lombok.Getter
 
@@ -34,4 +33,14 @@ class Member(
                 email = email, password = password, name = name, role = role, memberId = memberId
         )
     }
+
+    fun toResponse(): MemberResponse {
+        return MemberResponse(
+            email = this.email,
+            name = this.name,
+            role = this.role
+        )
+    }
+
 }
+
