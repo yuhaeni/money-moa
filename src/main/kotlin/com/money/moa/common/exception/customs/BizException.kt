@@ -1,4 +1,4 @@
-package com.common.exception.customs
+package com.money.moa.common.exception.customs
 
 import org.springframework.http.HttpStatus
 

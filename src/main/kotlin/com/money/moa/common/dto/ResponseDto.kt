@@ -1,4 +1,4 @@
-package com.common.dto
+package com.money.moa.common.dto
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

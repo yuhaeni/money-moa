@@ -1,7 +1,8 @@
-package com.common.exception.resolver
+package com.money.moa.common.exception.resolver
 
-import com.common.exception.enums.ExceptionEnum
+import com.money.moa.common.exception.enums.ExceptionEnum
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.money.moa.common.dto.ResponseDto
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
@@ -24,7 +25,7 @@ class CommonHandlerExceptionResolver : AbstractHandlerExceptionResolver() {
 
         val objectMapper = ObjectMapper()
         try {
-            response.writer.write(objectMapper.writeValueAsString(ex.message))
+            response.writer.write(objectMapper.writeValueAsString(ResponseDto.badRequest()))
             response.writer.flush()
         } catch (e: Exception) {
             logger.error("", e)

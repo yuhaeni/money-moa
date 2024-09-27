@@ -1,4 +1,4 @@
-package com.common.exception.customs;
+package com.money.moa.common.exception.customs;
 
 /* 참고용 java 파일
 import static java.util.stream.Collectors.toList;

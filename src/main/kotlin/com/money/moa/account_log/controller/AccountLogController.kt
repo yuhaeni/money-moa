@@ -1,6 +1,6 @@
 package com.money.moa.account_log.controller
 
-import com.common.dto.ResponseDto
+import com.money.moa.common.dto.ResponseDto
 import com.money.moa.account_log.dto.request.AccountLogDeleteRequest
 import com.money.moa.account_log.dto.request.AccountLogSaveRequest
 import com.money.moa.account_log.dto.request.AccountLogUpdateRequest

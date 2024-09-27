@@ -1,10 +1,11 @@
 package com.money.moa.member.service
 
-import com.common.dto.ResponseDto
-import com.common.exception.customs.BizException
+import com.money.moa.common.dto.ResponseDto
+import com.money.moa.common.exception.customs.BizException
+import com.money.moa.common.exception.customs.CommonExceptionHandler
 import com.money.moa.common.manager.MemberManager
 import com.money.moa.member.domain.MemberRepository
-import com.money.moa.member.dto.request.MemberFindRequest
+import com.money.moa.member.dto.request.MemberLoginRequest
 import com.money.moa.member.dto.request.MemberSaveRequest
 import com.money.moa.member.dto.response.MemberFindResponse
 import com.money.moa.member.dto.response.MemberResponse
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.ResponseStatus
 
 @Service
 class MemberService @Autowired constructor(
@@ -27,8 +29,8 @@ class MemberService @Autowired constructor(
         private val jwtProvider: JwtProvider
 ) {
 
-    fun login(response: HttpServletResponse, memberFindRequest: MemberFindRequest): ResponseEntity<ResponseDto<*>> {
-        val userDetails = userDetailsService.loadUserByUsername(memberFindRequest.email)
+    fun login(response: HttpServletResponse, memberLoginRequest: MemberLoginRequest): ResponseEntity<ResponseDto<*>> {
+        val userDetails = userDetailsService.loadUserByUsername(memberLoginRequest.email)
 
         val claims = jwtProvider.buildClaims(userDetails.userName, AuthorityUtils.authorityListToSet(userDetails.authorities))
         jwtProvider.issueToken(response, claims)
@@ -36,7 +38,7 @@ class MemberService @Autowired constructor(
         return ResponseDto.ok()
     }
 
-    fun findMember(memberFindRequest: MemberFindRequest): MemberFindResponse? {
+    fun findMember(memberFindRequest: MemberLoginRequest): MemberFindResponse? {
         val member = memberRepository.findByEmail(memberFindRequest.email)
                 ?: throw IllegalStateException("member not found")
         val isMatches = passwordEncoder.matches(memberFindRequest.password, member.password)
@@ -61,7 +63,6 @@ class MemberService @Autowired constructor(
 
     private fun validateSaveMember(memberSaveRequest: MemberSaveRequest) {
         if (memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
-            // throw BizException("이미 등록된 이메일입니다.") -> 상속된 RuntimeException 때문에 InternalServerError 발생 (500) DefaultExceptionHandler 확인 필요
             throw BizException(HttpStatus.BAD_REQUEST, "이미 등록된 이메일입니다.")
         }
 

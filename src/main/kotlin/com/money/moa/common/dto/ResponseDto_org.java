@@ -1,4 +1,4 @@
-package com.common.dto;
+package com.money.moa.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

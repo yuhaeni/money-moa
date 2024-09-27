@@ -1,6 +1,9 @@
 spring:
   application:
     name: moa
+  web:
+    resources:
+      add-mappings: false
   profiles:
     active: trace
 
@@ -27,6 +30,9 @@ spring:
       port: 6379
       password: gosl111
       host: localhost
+
+
+
 
 # web security config
 jwt:

@@ -8,9 +8,8 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 class JwtAuthFilter(private val jwtProvider: JwtProvider) : OncePerRequestFilter() {
 
-    private val excludeUrls = listOf("/join", "/login")
+    private val excludeUrls = listOf("/api/v1/member")
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-
         try {
             jwtProvider.filterValidator(request, response)
         } catch (e: Exception) {
@@ -22,7 +21,7 @@ class JwtAuthFilter(private val jwtProvider: JwtProvider) : OncePerRequestFilter
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return excludeUrls.stream().anyMatch {
+        return excludeUrls.any {
             request.servletPath.contains(it)
         }
     }

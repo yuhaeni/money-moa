@@ -1,6 +1,6 @@
 package com.money.moa.account_log.service
 
-import com.common.dto.ResponseDto
+import com.money.moa.common.dto.ResponseDto
 import com.money.moa.account_log.domain.AccountLog
 import com.money.moa.account_log.domain.AccountLogRepository
 import com.money.moa.account_log.dto.request.AccountLogDeleteRequest

@@ -1,4 +1,4 @@
-package com.common.exception.enums
+package com.money.moa.common.exception.enums
 
 import org.springframework.http.HttpStatus
 
