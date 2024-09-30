@@ -1,5 +1,6 @@
 package com.money.moa.securiy.interceptor
 
+import com.money.moa.securiy.CustomUserDetails
 import com.money.moa.securiy.jwt.JwtProvider
 import io.jsonwebtoken.ExpiredJwtException
 import jakarta.servlet.http.HttpServletRequest
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.HandlerInterceptor
 import java.lang.IllegalArgumentException
 import java.security.SignatureException
+
 @Configuration
 class AuthInterceptor(private val jwtProvider: JwtProvider) : HandlerInterceptor {
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
@@ -25,12 +27,15 @@ class AuthInterceptor(private val jwtProvider: JwtProvider) : HandlerInterceptor
                 return false
             }
             val authentication = jwtProvider.getAuthentication(accessToken)
-            val memberDetails = authentication.principal
+            val memberDetails = authentication.principal as CustomUserDetails
+
+            if (jwtProvider.isBlackListToken(memberDetails.userName)) {
+                return false
+            }
 
             request.setAttribute("_memberDetails", memberDetails)
         } catch (e: ExpiredJwtException) {
             val encryptRefreshToken = jwtProvider.resolveRefreshTokenInRedis(e.claims.subject)
-
             val refreshToken = jwtProvider.decryptToken(encryptRefreshToken)
             val isValidateToken = jwtProvider.validateToken(refreshToken)
             if (!isValidateToken) {
@@ -42,12 +47,10 @@ class AuthInterceptor(private val jwtProvider: JwtProvider) : HandlerInterceptor
             return true
         } catch (e: SignatureException) {
             jwtProvider.removeAuthentication(request, response)
-            jwtProvider.setBlackListToken(accessToken)
 
             return false
         } catch (e: IllegalArgumentException) {
             jwtProvider.removeAuthentication(request, response)
-            jwtProvider.setBlackListToken(accessToken)
 
             return false
         } catch (e: Exception) {

@@ -10,12 +10,14 @@ import com.money.moa.account_log.dto.response.AccountLogFindResponse
 import com.money.moa.account_log.manager.AccountLogManager
 import com.money.moa.category.domain.Category
 import com.money.moa.category.domain.CategoryRepository
+import com.money.moa.common.exception.CommonException
 import com.money.moa.member.domain.Member
 import com.money.moa.member.domain.MemberRepository
 import com.money.moa.securiy.CustomUserDetails
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,7 +36,7 @@ class AccountLogService @Autowired constructor(
 
         val member: Member = getMember(httpServletRequest)
         val category: Category = categoryRepository.findByIdOrNull(accountLogSaveRequest.categoryId)
-                ?: throw IllegalStateException("category not found")
+                ?: throw CommonException(HttpStatus.NOT_FOUND, "category not found")
 
         accountLogRepository.save(accountLogSaveRequest.toEntity(member, category))
         return ResponseDto.ok()
@@ -49,24 +51,22 @@ class AccountLogService @Autowired constructor(
     @Transactional
     fun updateAccountLog(httpServletRequest: HttpServletRequest, accountLogUpdateRequest: AccountLogUpdateRequest): ResponseEntity<ResponseDto<*>> {
         if (!accountLogManager.checkBigNumber(accountLogUpdateRequest.money)) {
-            return ResponseDto.badRequest()
+            throw CommonException(HttpStatus.BAD_REQUEST, "유효하지 않은 금액입니다.")
         }
 
         val accountLog: AccountLog = accountLogRepository.findByIdOrNull(accountLogUpdateRequest.accountLogId)
-                ?: throw IllegalStateException("account log not found")
+                ?: throw CommonException(HttpStatus.NOT_FOUND, "account log not found")
         accountLog.updateAccountLog(accountLogUpdateRequest)
         return ResponseDto.ok()
     }
 
     fun deleteAccountLog(httpServletRequest: HttpServletRequest, accountLogDeleteRequest: AccountLogDeleteRequest): ResponseEntity<ResponseDto<*>> {
         val accountLog = accountLogRepository.findByIdOrNull(accountLogDeleteRequest.accountLogId)
-        if (accountLog == null) {
-            return ResponseDto.badRequest()
-        }
+                ?: throw CommonException(HttpStatus.BAD_REQUEST, "account log not found")
 
         val member: Member = getMember(httpServletRequest)
         if (accountLog.member.memberId != member.memberId) {
-            return ResponseDto.badRequest()
+            throw CommonException(HttpStatus.BAD_REQUEST, "member not found")
         }
 
         accountLogRepository.delete(accountLog)
@@ -76,6 +76,6 @@ class AccountLogService @Autowired constructor(
     private fun getMember(httpServletRequest: HttpServletRequest): Member {
         val customUserDetails = httpServletRequest.getAttribute("_memberDetails") as CustomUserDetails
         return memberRepository.findByEmail(customUserDetails.userName)
-                ?: throw IllegalStateException("member not found")
+                ?: throw CommonException(HttpStatus.BAD_REQUEST, "member not found")
     }
 }

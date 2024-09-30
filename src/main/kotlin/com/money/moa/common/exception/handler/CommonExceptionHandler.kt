@@ -1,6 +1,7 @@
-package com.money.moa.common.exception.customs
+package com.money.moa.common.exception.handler
 
 import com.money.moa.common.dto.ResponseDto
+import com.money.moa.common.exception.CommonException
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class CommonExceptionHandler {
     // BizException 발생 시 handler를 통해 리턴 코드 변경 (테스트 필요) CommonExceptionHandler_org.java 참고
 
-    @ExceptionHandler(BizException::class)
-    fun handleBizException(ex: BizException): ResponseEntity<ResponseDto<*>> {
+    @ExceptionHandler(CommonException::class)
+    fun handleBizException(ex: CommonException): ResponseEntity<ResponseDto<*>> {
         val response = ResponseDto(
                 code = ex.code ?: HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 message = ex.message,

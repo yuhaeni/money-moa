@@ -1,8 +1,8 @@
-package com.money.moa.common.exception.customs
+package com.money.moa.common.exception
 
 import org.springframework.http.HttpStatus
 
-class BizException : RuntimeException {
+class CommonException : RuntimeException {
     val code: Int?
     val data: Array<out Any>?
 

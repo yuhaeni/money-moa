@@ -1,24 +1,26 @@
 package com.money.moa.member.service
 
 import com.money.moa.common.dto.ResponseDto
-import com.money.moa.common.exception.customs.BizException
-import com.money.moa.common.exception.customs.CommonExceptionHandler
+import com.money.moa.common.exception.CommonException
 import com.money.moa.common.manager.MemberManager
 import com.money.moa.member.domain.MemberRepository
 import com.money.moa.member.dto.request.MemberLoginRequest
 import com.money.moa.member.dto.request.MemberSaveRequest
 import com.money.moa.member.dto.response.MemberFindResponse
 import com.money.moa.member.dto.response.MemberResponse
+import com.money.moa.redis.util.RedisUtil
 import com.money.moa.securiy.jwt.JwtProvider
 import com.money.moa.securiy.user.CustomUserDetailsService
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.ResponseStatus
 
 @Service
 class MemberService @Autowired constructor(
@@ -26,7 +28,7 @@ class MemberService @Autowired constructor(
         private val passwordEncoder: PasswordEncoder,
         private val memberManager: MemberManager,
         private val userDetailsService: CustomUserDetailsService,
-        private val jwtProvider: JwtProvider
+        private val jwtProvider: JwtProvider,
 ) {
 
     fun login(response: HttpServletResponse, memberLoginRequest: MemberLoginRequest): ResponseEntity<ResponseDto<*>> {
@@ -40,7 +42,7 @@ class MemberService @Autowired constructor(
 
     fun findMember(memberFindRequest: MemberLoginRequest): MemberFindResponse? {
         val member = memberRepository.findByEmail(memberFindRequest.email)
-                ?: throw IllegalStateException("member not found")
+                ?: throw CommonException(HttpStatus.NOT_FOUND, "member not found")
         val isMatches = passwordEncoder.matches(memberFindRequest.password, member.password)
         if (!isMatches) {
             return null
@@ -63,11 +65,21 @@ class MemberService @Autowired constructor(
 
     private fun validateSaveMember(memberSaveRequest: MemberSaveRequest) {
         if (memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
-            throw BizException(HttpStatus.BAD_REQUEST, "이미 등록된 이메일입니다.")
+            throw CommonException(HttpStatus.BAD_REQUEST, "이미 등록된 이메일입니다.")
         }
 
         if (!memberManager.checkMemberPassword(memberSaveRequest.password)) {
-            throw BizException(HttpStatus.BAD_REQUEST, "유효하지 않은 비밀번호입니다.")
+            throw CommonException(HttpStatus.BAD_REQUEST, "유효하지 않은 비밀번호입니다.")
         }
+    }
+
+    fun logout(httpServletRequest: HttpServletRequest): ResponseEntity<ResponseDto<*>> {
+        try {
+            jwtProvider.setBlackListToken(httpServletRequest)
+        } catch (e: Exception) {
+            throw CommonException(HttpStatus.BAD_REQUEST, e.message.toString())
+        }
+
+        return ResponseDto.ok()
     }
 }

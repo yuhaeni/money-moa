@@ -1,7 +1,9 @@
 package com.money.moa.common.util
 
+import com.money.moa.common.exception.CommonException
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.io.Encoders
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import java.io.UnsupportedEncodingException
 import java.security.Key
@@ -31,7 +33,11 @@ class AES256 {
         }
 
         keyByteArray = b.copyOf(size)
-        keySpec = SecretKeySpec(keyByteArray, "AES")
+        try {
+            keySpec = SecretKeySpec(keyByteArray, "AES")
+        } catch (e: UnsupportedEncodingException) {
+            throw CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "Unsupported Encoding")
+        }
     }
 
     /**

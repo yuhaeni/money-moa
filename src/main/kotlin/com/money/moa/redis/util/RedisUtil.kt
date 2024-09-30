@@ -18,7 +18,7 @@ class RedisUtil(private val redisTemplate: StringRedisTemplate) {
         val valueOperations = redisTemplate.opsForValue();
         val existingValue = valueOperations.get(key).orEmpty()
         if (existingValue.isNotBlank()) {
-            val ttl = redisTemplate.getExpire(existingValue)
+            val ttl = redisTemplate.getExpire(key)
             valueOperations.set(key, value, ttl, TimeUnit.SECONDS)
         }
     }

@@ -1,5 +1,6 @@
 package com.money.moa.securiy.jwt
 
+import com.money.moa.common.exception.CommonException
 import com.money.moa.common.util.AES256
 import com.money.moa.redis.util.RedisUtil
 import com.money.moa.securiy.CustomUserDetails
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -112,7 +114,7 @@ class JwtProvider @Autowired constructor(
         try {
             response.setHeader(jwtProperties.access.tokenHeaderName, encryptToken(token))
         } catch (e: Exception) {
-            throw IllegalArgumentException("encrypt token fail")
+            throw CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "encrypt token fail")
         }
     }
 
@@ -123,7 +125,7 @@ class JwtProvider @Autowired constructor(
      * @param token
      */
     fun saveRefreshTokenToRedis(claims: Claims, token: String) {
-        redisUtil.setRedisValueWithTimeout(jwtProperties.refresh.tokenHeaderName.plus(":").plus(claims.subject), encryptToken(token), 180)
+        redisUtil.setRedisValueWithTimeout(jwtProperties.refresh.tokenHeaderName.plus(":").plus(claims.subject), encryptToken(token), 540)
     }
 
     private fun encryptToken(token: String): String {
@@ -152,18 +154,19 @@ class JwtProvider @Autowired constructor(
      * @return 유효한 토큰이면 true
      */
     fun validateToken(token: String): Boolean {
-        if (isBlackListToken(token)) {
-            return false
-        }
+        // TODO 수정필요
+//        if (isBlackListToken(token)) {
+//            return false
+//        }
 
         try {
             extractAllClaims(token)
         } catch (e: ExpiredJwtException) {
             logger.error("", e)
-            throw e
+            throw CommonException("Expired Jwt")
         } catch (e: Exception) {
             logger.error("", e)
-            throw e
+            throw CommonException(HttpStatus.INTERNAL_SERVER_ERROR, e.message.toString())
         }
 
         return true
@@ -172,12 +175,12 @@ class JwtProvider @Autowired constructor(
     /**
      * 블랙리스트 토큰인지 확인
      *
-     * @param token
+     * @param key
      * @return 블랙리스트 토큰이면 true
      */
-    fun isBlackListToken(token: String): Boolean {
-        val value = redisUtil.getRedisValue(token)
-        return (value.isNotBlank() && value == "LOGOUT")
+    fun isBlackListToken(subject: String): Boolean {
+        val value = redisUtil.getRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(subject))
+        return (value.isBlank() || value == "LOGOUT")
     }
 
     /**
@@ -197,7 +200,7 @@ class JwtProvider @Autowired constructor(
      * @return access-token
      */
     fun resolveRefreshTokenInRedis(subject: String): String {
-        return redisUtil.getRedisValue(subject)
+        return redisUtil.getRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(subject))
     }
 
     /**
@@ -212,7 +215,7 @@ class JwtProvider @Autowired constructor(
             return aeS256.decrypt(encryptToken)
         } catch (e: Exception) {
             logger.error("", e)
-            throw IllegalArgumentException("decrypt token fail")
+            throw CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "decrypt token fail")
         }
     }
 
@@ -278,9 +281,14 @@ class JwtProvider @Autowired constructor(
      *
      * @param request
      */
-    fun setBlackListToken(token: String) {
-        val jwtClaims = extractAllClaims(token)
-        redisUtil.modifyRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(jwtClaims.payload), "LOGOUT")
+    fun setBlackListToken(httpServletRequest: HttpServletRequest) {
+        var encryptAccessToken = this.resolveAccessTokenInHeader(httpServletRequest)
+        if (encryptAccessToken.isNotBlank()) {
+            encryptAccessToken = encryptAccessToken.replace("Bearer ", "")
+            val accessToken = this.decryptToken(encryptAccessToken)
+            val jwtClaims = extractAllClaims(accessToken)
+            redisUtil.modifyRedisValue(jwtProperties.refresh.tokenHeaderName.plus(":").plus(jwtClaims.payload.subject), "LOGOUT")
+        }
     }
 
     /**
