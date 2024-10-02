@@ -1,5 +1,6 @@
 package com.money.moa.common.util
 
+import com.money.moa.common.error.enums.CommonErrorCode
 import com.money.moa.common.exception.CommonException
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.io.Encoders
@@ -36,7 +37,7 @@ class AES256 {
         try {
             keySpec = SecretKeySpec(keyByteArray, "AES")
         } catch (e: UnsupportedEncodingException) {
-            throw CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "Unsupported Encoding")
+            throw CommonException(CommonErrorCode.INTERNAL_SERVER_ERROR)
         }
     }
 

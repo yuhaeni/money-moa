@@ -1,6 +1,5 @@
 package com.money.moa.securiy.user
 
-import com.money.moa.common.enums.Role
 import com.money.moa.member.domain.MemberRepository
 import com.money.moa.securiy.CustomUserDetails
 import org.springframework.security.core.authority.SimpleGrantedAuthority

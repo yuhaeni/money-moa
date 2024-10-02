@@ -1,6 +1,6 @@
 package com.money.moa.securiy.config
 
-import com.money.moa.common.enums.Role
+import com.money.moa.member.enums.Role
 import com.money.moa.common.util.AES256
 import com.money.moa.redis.util.RedisUtil
 import com.money.moa.securiy.filter.JwtAuthFilter

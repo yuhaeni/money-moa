@@ -1,5 +1,6 @@
 package com.money.moa.securiy.jwt
 
+import com.money.moa.common.error.enums.CommonErrorCode
 import com.money.moa.common.exception.CommonException
 import com.money.moa.common.util.AES256
 import com.money.moa.redis.util.RedisUtil
@@ -154,11 +155,6 @@ class JwtProvider @Autowired constructor(
      * @return 유효한 토큰이면 true
      */
     fun validateToken(token: String): Boolean {
-        // TODO 수정필요
-//        if (isBlackListToken(token)) {
-//            return false
-//        }
-
         try {
             extractAllClaims(token)
         } catch (e: ExpiredJwtException) {
@@ -215,7 +211,7 @@ class JwtProvider @Autowired constructor(
             return aeS256.decrypt(encryptToken)
         } catch (e: Exception) {
             logger.error("", e)
-            throw CommonException(HttpStatus.INTERNAL_SERVER_ERROR, "decrypt token fail")
+            throw CommonException(CommonErrorCode.INTERNAL_SERVER_ERROR)
         }
     }
 

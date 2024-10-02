@@ -2,7 +2,7 @@ package com.money.moa.member.domain
 
 import com.money.moa.common.domain.BaseEntity
 import com.money.moa.member.dto.response.MemberFindResponse
-import com.money.moa.member.dto.response.MemberResponse
+import com.money.moa.member.dto.response.MemberSaveResponse
 import jakarta.persistence.*
 import lombok.Getter
 
@@ -34,8 +34,8 @@ class Member(
         )
     }
 
-    fun toResponse(): MemberResponse {
-        return MemberResponse(
+    fun toDto(): MemberSaveResponse {
+        return MemberSaveResponse(
             email = this.email,
             name = this.name,
             role = this.role

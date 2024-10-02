@@ -1,4 +1,4 @@
-package com.money.moa.common.enums
+package com.money.moa.member.enums
 
 enum class Role(private var role: String) {
     ADMIN("ROLE_ADMIN")

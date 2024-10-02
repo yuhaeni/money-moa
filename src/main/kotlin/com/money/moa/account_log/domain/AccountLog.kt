@@ -2,6 +2,7 @@ package com.money.moa.account_log.domain
 
 import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
+import com.money.moa.account_log.dto.response.AccountLogSaveResponse
 import com.money.moa.category.domain.Category
 import com.money.moa.common.domain.BaseEntity
 import com.money.moa.member.domain.Member
@@ -51,5 +52,13 @@ class AccountLog(
         date = accountLogUpdateRequest.date
         money = accountLogUpdateRequest.money
         detail = accountLogUpdateRequest.detail
+    }
+
+    fun toDto(): AccountLogSaveResponse {
+        return AccountLogSaveResponse(
+                date = this.date,
+                money = this.money,
+                detail = this.detail
+        )
     }
 }

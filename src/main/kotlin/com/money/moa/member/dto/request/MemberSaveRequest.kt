@@ -1,6 +1,5 @@
 package com.money.moa.member.dto.request
 
-import com.money.moa.common.enums.Role
 import com.money.moa.member.domain.Member
 
 class MemberSaveRequest(

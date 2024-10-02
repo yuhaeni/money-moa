@@ -1,5 +1,6 @@
 package com.money.moa.common.exception
 
+import com.money.moa.common.error.enums.`interface`.ErrorCodeEnum
 import org.springframework.http.HttpStatus
 
 class CommonException : RuntimeException {
@@ -57,6 +58,12 @@ class CommonException : RuntimeException {
     // 코드, 메시지, 원인 예외를 포함한 생성자
     constructor(code: Int, message: String, cause: Throwable) : super(message, cause) {
         this.code = code
+        this.data = null
+    }
+
+    // ErrorCodeEnum을 포함한 생성자
+    constructor(errorCodeEnum: ErrorCodeEnum) : super(errorCodeEnum.message()) {
+        this.code = errorCodeEnum.httpStatus().value()
         this.data = null
     }
 }
