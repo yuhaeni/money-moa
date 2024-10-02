@@ -5,6 +5,7 @@ import com.money.moa.account_log.dto.request.AccountLogDeleteRequest
 import com.money.moa.account_log.dto.request.AccountLogSaveRequest
 import com.money.moa.account_log.dto.request.AccountLogUpdateRequest
 import com.money.moa.account_log.dto.response.AccountLogFindResponse
+import com.money.moa.account_log.dto.response.AccountLogSaveResponse
 import com.money.moa.account_log.service.AccountLogService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
@@ -16,7 +17,7 @@ class AccountLogController(
         private val accountLogService: AccountLogService
 ) {
     @PostMapping
-    fun saveAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogSaveRequest: AccountLogSaveRequest): ResponseEntity<ResponseDto<*>> {
+    fun saveAccountLog(httpServletRequest: HttpServletRequest, @RequestBody accountLogSaveRequest: AccountLogSaveRequest): ResponseEntity<ResponseDto<AccountLogSaveResponse>> {
         return accountLogService.saveAccountLog(httpServletRequest, accountLogSaveRequest)
     }
 
