@@ -64,7 +64,7 @@ class MemberService @Autowired constructor(
     }
 
     private fun validateSaveMember(memberSaveRequest: MemberSaveRequest) {
-        if (memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
+        if (!memberManager.checkDuplicateMemberEmail(memberSaveRequest.email)) {
             throw CommonException(MemberErrorCode.DUPLICATE_EMAIL)
         }
 

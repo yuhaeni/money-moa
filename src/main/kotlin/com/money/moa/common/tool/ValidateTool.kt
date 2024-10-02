@@ -5,7 +5,7 @@ import java.util.regex.Pattern
 class ValidateTool {
     companion object {
         private const val PATTERN_EMAIL: String = "[0-9a-zA-Z]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$"
-        private const val PATTERN_PASSWORD: String = "^(?=.*[0-9])(?=.*[$@$!%*#?&.])[[0-9]$@$!%*#?&.]{8,20}$"
+        private const val PATTERN_PASSWORD: String = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,20}$"
 
         fun isValidEmail(email: String?): Boolean {
             if (email.isNullOrBlank()) {
@@ -18,6 +18,7 @@ class ValidateTool {
             if (password.isNullOrBlank()) {
                 return false
             }
+
             return matchesPattern(PATTERN_PASSWORD, password)
         }
 
