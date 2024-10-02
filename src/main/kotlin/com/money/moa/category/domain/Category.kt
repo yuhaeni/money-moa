@@ -1,6 +1,7 @@
 package com.money.moa.category.domain
 
-import com.money.moa.category.dto.CategoryFindResponse
+import com.money.moa.category.dto.response.CategoryFindResponse
+import com.money.moa.category.dto.response.CategorySaveResponse
 import com.money.moa.common.domain.BaseEntity
 import jakarta.persistence.*
 import lombok.Getter
@@ -12,15 +13,22 @@ class Category(
         @Column
         val categoryName: String,
         @Column
-        val categoryType: Char,
+        val categoryType: String,
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val categoryId: Long? = null
 ) : BaseEntity() {
-        fun fromEntity(): CategoryFindResponse {
-                return CategoryFindResponse(
-                        categoryName = categoryName,
-                        categoryType =  categoryType
-                )
-        }
+    fun fromEntity(): CategoryFindResponse {
+        return CategoryFindResponse(
+                categoryName = categoryName,
+                categoryType = categoryType
+        )
+    }
+
+    fun toDto(): CategorySaveResponse {
+        return CategorySaveResponse(
+                categoryName = categoryName,
+                categoryType = categoryType
+        )
+    }
 }

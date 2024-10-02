@@ -1,10 +1,8 @@
 package com.money.moa.category.controller
 
-import com.money.moa.category.dto.CategoryFindResponse
-import com.money.moa.category.dto.CategorySaveRequest
+import com.money.moa.category.dto.response.CategoryFindResponse
+import com.money.moa.category.dto.request.CategorySaveRequest
 import com.money.moa.category.service.CategoryService
-import org.springframework.security.access.annotation.Secured
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
