@@ -13,13 +13,16 @@ import java.nio.charset.StandardCharsets
 
 class CommonHandlerExceptionResolver : AbstractHandlerExceptionResolver() {
     override fun doResolveException(request: HttpServletRequest, response: HttpServletResponse, handler: Any?, ex: java.lang.Exception): ModelAndView? {
+        var view = ModelAndView()
+
         val exceptionClassName = ex.javaClass.getName()
         val exceptionClass = ExceptionEnum.ExceptionClassName.findClassName(exceptionClassName)
-        if (exceptionClass != null) {
-            response.status = exceptionClass.httpStatus
-        } else {
-            response.status = HttpStatus.INTERNAL_SERVER_ERROR.value()
+        if (exceptionClass == null) {
+            // TODO null 반환하면 ExceptionHandler가 동작하는데, 올바른 방식으로 구현한 건지??
+            return null
         }
+
+        response.status = exceptionClass.httpStatus
         response.contentType = MediaType.APPLICATION_JSON.type
         response.characterEncoding = StandardCharsets.UTF_8.name()
 
@@ -31,7 +34,6 @@ class CommonHandlerExceptionResolver : AbstractHandlerExceptionResolver() {
             logger.error("", e)
         }
 
-        // TODO ExceptionHandler로 넘겨서 동작하도록 고민해보기
-        return null
+        return view
     }
 }

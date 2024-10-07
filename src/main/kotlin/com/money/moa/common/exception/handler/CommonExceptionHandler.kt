@@ -2,17 +2,13 @@ package com.money.moa.common.exception.handler
 
 import com.money.moa.common.dto.ResponseDto
 import com.money.moa.common.exception.CommonException
-import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
 class CommonExceptionHandler {
-
     @ExceptionHandler(CommonException::class)
     fun handleBizException(ex: CommonException): ResponseEntity<ResponseDto<*>> {
         val response = ResponseDto(
