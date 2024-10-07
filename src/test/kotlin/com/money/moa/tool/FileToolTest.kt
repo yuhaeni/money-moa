@@ -19,7 +19,7 @@ class FileToolTest {
 
     @BeforeEach
     fun setUp() {
-        fileProperties = FileProperties("/Users/haeni/Documents/upload")
+        fileProperties = FileProperties("/Users/haeni/Documents/upload/")
         fileTool = FileTool(fileProperties)
     }
 
@@ -33,10 +33,11 @@ class FileToolTest {
                 MediaType.TEXT_PLAIN_VALUE,
                 "Test file content".toByteArray()
         )
+        val saveFileName = fileTool.getSaveFileName(mockFile.originalFilename)
 
         // when
         try {
-            fileTool.uploadFile(mockFile)
+            fileTool.uploadFile(mockFile, saveFileName)
         } catch (e: Exception) {
             throw CommonException(CommonErrorCode.INTERNAL_SERVER_ERROR)
         }

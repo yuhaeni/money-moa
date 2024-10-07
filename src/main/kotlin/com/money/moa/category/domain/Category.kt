@@ -17,6 +17,8 @@ class Category(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val categoryId: Long? = null
+
+        // TODO 아이콘 이미지 연관관계 추가
 ) : BaseEntity() {
     fun fromEntity(): CategoryFindResponse {
         return CategoryFindResponse(

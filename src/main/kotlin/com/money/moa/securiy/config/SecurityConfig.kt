@@ -45,6 +45,7 @@ class SecurityConfig(private val jwtProperties: JwtProperties, private val redis
                             .requestMatchers("/api/v1/account-log/**").hasAnyAuthority(Role.USER.value())
                             .requestMatchers(HttpMethod.POST, "/api/v1/category/**").hasAnyAuthority(Role.ADMIN.value())
                             .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
+                            .requestMatchers("/api/v1/category_icon/**").hasAnyAuthority(Role.ADMIN.value())
                 }
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
