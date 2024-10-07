@@ -46,3 +46,6 @@ jwt:
     expire-milliseconds: 3600000
     token-header-name: Authorization-Refresh
 
+# file
+file:
+  upload-dir: /Users/haeni/Documents/upload
