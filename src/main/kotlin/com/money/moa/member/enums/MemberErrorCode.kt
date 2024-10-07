@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus
 
 enum class MemberErrorCode(val httpStatus: HttpStatus, val message: String) : ErrorCodeEnum {
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "Duplicate email"),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "Invalid password"),
-    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "Not found member");
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "Invalid password"),
+    NOT_FOUND_MEMBER(HttpStatus.UNAUTHORIZED, "Not found member");
 
     override fun httpStatus(): HttpStatus {
         return httpStatus

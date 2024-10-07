@@ -31,24 +31,15 @@ class MemberService @Autowired constructor(
 
     fun login(response: HttpServletResponse, memberLoginRequest: MemberLoginRequest): ResponseEntity<ResponseDto<*>> {
         val userDetails = userDetailsService.loadUserByUsername(memberLoginRequest.email)
+        val isMatches = passwordEncoder.matches(memberLoginRequest.password, userDetails.password)
+        if (!isMatches) {
+            throw CommonException(MemberErrorCode.INVALID_PASSWORD)
+        }
 
         val claims = jwtProvider.buildClaims(userDetails.userName, AuthorityUtils.authorityListToSet(userDetails.authorities))
         jwtProvider.issueToken(response, claims)
 
         return ResponseDto.ok()
-    }
-
-    fun findMember(memberFindRequest: MemberLoginRequest): MemberFindResponse? {
-        val member = memberRepository.findByEmail(memberFindRequest.email)
-        if (member == null) {
-            throw CommonException(MemberErrorCode.NOT_FOUND_MEMBER)
-        }
-        val isMatches = passwordEncoder.matches(memberFindRequest.password, member.password)
-        if (!isMatches) {
-            throw CommonException(MemberErrorCode.INVALID_PASSWORD)
-        }
-
-        return member.fromEntity()
     }
 
     fun saveMember(memberSaveRequest: MemberSaveRequest): ResponseEntity<ResponseDto<MemberSaveResponse>> {
