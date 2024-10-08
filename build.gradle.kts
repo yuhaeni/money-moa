@@ -26,14 +26,36 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.springframework.boot:spring-boot-configuration-processor")
+
+    // jwt
+    implementation("io.jsonwebtoken:jjwt-api:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
+
+
+    // redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    implementation("org.apache.commons:commons-lang3:3.14.0")
+
+    implementation("org.slf4j:slf4j-api:2.0.16")
+
+    // thymeleaf
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.3.2")
+
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.h2database:h2")
     annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.kafka:spring-kafka-test")
@@ -49,4 +71,12 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+allOpen {
+    annotation("javax.persistence.Entity")
+}
+
+noArg {
+    annotation("javax.persistence.Entity")
 }
