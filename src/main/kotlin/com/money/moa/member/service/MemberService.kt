@@ -33,6 +33,8 @@ class MemberService @Autowired constructor(
         val userDetails = userDetailsService.loadUserByUsername(memberLoginRequest.email)
         val isMatches = passwordEncoder.matches(memberLoginRequest.password, userDetails.password)
         if (!isMatches) {
+            // TODO 모두 CommonException을 이용해서 예외처리를 하고 있는데, ResponseDto.badRequest() 등으로 반환하는 예시도 필요함
+            // TODO 어떤 경우에 예외처리를 할지, ResponseDto로 리턴을 할지 정책이 필요함
             throw CommonException(MemberErrorCode.INVALID_PASSWORD)
         }
 
