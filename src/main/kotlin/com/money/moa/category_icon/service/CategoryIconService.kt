@@ -6,6 +6,7 @@ import com.money.moa.category_icon.dto.response.CategoryIconSaveResponse
 import com.money.moa.common.dto.ResponseDto
 import com.money.moa.common.error.enums.CommonErrorCode
 import com.money.moa.common.exception.CommonException
+import com.money.moa.common.properties.FileProperties
 import com.money.moa.common.tool.FileTool
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,9 +18,11 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 class CategoryIconService @Autowired constructor(
         private val fileTool: FileTool,
-        private val categoryIconRepository: CategoryIconRepository
+        private val categoryIconRepository: CategoryIconRepository,
+        private val fileProperties: FileProperties
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val UPLOAD_DIR = fileProperties.uploadDir
 
     @Transactional
     fun saveCategoryIcon(file: MultipartFile): ResponseEntity<ResponseDto<CategoryIconSaveResponse>> {
@@ -38,9 +41,14 @@ class CategoryIconService @Autowired constructor(
 
         val categoryIcon = CategoryIcon(
                 originalFileName = file.originalFilename!!,
-                saveFileName = saveFileName
+                saveFileName = saveFileName,
+                filePath = UPLOAD_DIR.plus(saveFileName)
         )
         val saveCategoryIcon = categoryIconRepository.save(categoryIcon)
         return ResponseDto.created(saveCategoryIcon.toDto())
+    }
+
+    fun findCategoryIcon() {
+        // TODO 아이콘 조회 기능 구현
     }
 }

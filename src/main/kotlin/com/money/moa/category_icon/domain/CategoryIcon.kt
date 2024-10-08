@@ -13,6 +13,9 @@ class CategoryIcon(
         @Column
         var originalFileName: String,
 
+        @Column
+        var filePath: String,
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val categoryIconId: Long? = null
