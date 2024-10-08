@@ -20,15 +20,22 @@ class FileTool(private val fileProperties: FileProperties) {
     }
 
     /**
+     * 확장자 추출
+     *
+     * @param originalFilename
+     */
+    fun getExtension(originalFilename: String): String {
+        val extPostIndex: Int = originalFilename.lastIndexOf(".")
+        return originalFilename.substring(extPostIndex.plus(1))
+    }
+
+    /**
      * 파일명 생성
      *
      * @param originalFilename
      */
     fun getSaveFileName(originalFilename: String): String {
-        val extPostIndex: Int = originalFilename.lastIndexOf(".")
-        val ext = originalFilename.substring(extPostIndex.plus(1))
-
+        val ext = getExtension(originalFilename)
         return UUID.randomUUID().toString().plus(".").plus(ext)
     }
-
 }

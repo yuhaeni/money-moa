@@ -1,6 +1,9 @@
 package com.money.moa.category_icon.controller
 
+import com.money.moa.category_icon.dto.response.CategoryIconSaveResponse
 import com.money.moa.category_icon.service.CategoryIconService
+import com.money.moa.common.dto.ResponseDto
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -14,9 +17,8 @@ class CategoryIconController(
 ) {
 
     @PostMapping
-    fun saveCategoryIcon(@RequestParam("file") file: MultipartFile) {
-        categoryIconService.saveCategoryIcon(file)
-        // TODO response dto 추가
+    fun saveCategoryIcon(@RequestParam("file") file: MultipartFile): ResponseEntity<ResponseDto<CategoryIconSaveResponse>> {
+        return categoryIconService.saveCategoryIcon(file)
     }
 
 }
